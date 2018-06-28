@@ -1,0 +1,12 @@
+(alias
+ ((name runtest)
+  (deps (test_low_level_process.exe))
+  (action (bash "./${<}"))))
+
+(executables
+ ((names (test_low_level_process))
+  (libraries (low_level_process
+              oUnit))
+  (preprocess (pps (ppx_jane ppxlib.runner)))))
+
+(jbuild_version 1)

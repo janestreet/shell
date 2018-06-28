@@ -1,0 +1,7 @@
+(library
+ ((name shell_internal)
+  (public_name shell.shell_internal)
+  (libraries (core))
+  (preprocess (pps (ppx_jane ppxlib.runner)))))
+
+(jbuild_version 1)
