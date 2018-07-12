@@ -1,7 +1,7 @@
 (library
  ((name shell)
   (public_name shell)
-  (libraries (console
+  (libraries (textutils.console
               core
               filename_extended
               low_level_process
