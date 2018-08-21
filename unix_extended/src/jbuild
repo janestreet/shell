@@ -12,6 +12,6 @@
 (rule
  ((targets (config.h))
   (deps ())
-  (action (bash "cp ${findlib:core:config.h} ${@}"))))
+  (action (bash "cp ${findlib:core_kernel.config_h:config.h} ${@}"))))
 
 (jbuild_version 1)
