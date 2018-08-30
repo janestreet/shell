@@ -1,6 +1,7 @@
 (library
  ((name shell)
   (public_name shell)
+  (preprocess (pps (ppx_jane -dont-check-doc-comments-attachment ppxlib.runner)))
   (libraries (textutils.console
               core
               filename_extended
@@ -8,7 +9,6 @@
               re2
               shell_internal
               string_extended
-              unix_extended))
-  (preprocess (pps (ppx_jane ppxlib.runner)))))
+              unix_extended))))
 
 (jbuild_version 1)
