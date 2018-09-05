@@ -15,7 +15,7 @@ module Query = struct
       Command.Spec.(
         (step (fun f v -> f ~id:(lookup_id v))
          +> anon (String.uppercase id_kind %: string))
-        +> anon ("DEVICE" %: file)
+        +> anon ("DEVICE" %: Filename.arg_type)
       )
       (fun ~id device () ->
         let bytes_limit, bytes_usage, inodes_limit, inodes_usage =
@@ -80,7 +80,7 @@ module Modify = struct
           ~doc:"inode usage hard limit"
         +> flag "-inodes-grace" (optional grace)
           ~doc:"inode usage grace period"
-        +> anon ("DEVICE" %: file)
+        +> anon ("DEVICE" %: Filename.arg_type)
       )
       (fun ~id bsoft bhard bgrace isoft ihard igrace device () ->
         let bytes_limit, _bytes_usage, inodes_limit, _inodes_usage =
