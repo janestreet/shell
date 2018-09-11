@@ -34,8 +34,8 @@ val unescaped : ?strict:bool -> string -> string
 *)
 val unescaped_res : ?strict:bool -> string -> (string,(int*string)) Result.t
 
-(** [squeeze str] reduces all sequences of spaces, newlines, tables, and
- * carriage returns to single spaces.
+(** [squeeze str] reduces all sequences of spaces, newlines, tabs, and carriage
+    returns to single spaces.
 *)
 val squeeze : string -> string
 
