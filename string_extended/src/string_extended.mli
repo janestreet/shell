@@ -32,7 +32,7 @@ val unescaped : ?strict:bool -> string -> string
    Same as [unescaped] but instead of raising [Failure _] returns an error
    message with the position in the string in case of failure.
 *)
-val unescaped_res : ?strict:bool -> string -> (string,(int*string)) Result.t
+val unescaped_res : ?strict:bool -> string -> (string, int * string) Result.t
 
 (** [squeeze str] reduces all sequences of spaces, newlines, tabs, and carriage
     returns to single spaces.
@@ -48,10 +48,11 @@ val is_substring_deprecated : substring:string -> string -> bool
     left of the string. If s is already longer than [len] it is returned unchanged.
 *)
 val pad_left : ?char:char -> string -> int -> string
+
 val pad_right : ?char:char -> string -> int -> string
 
 (**deprecated in favour of word_wrap *)
-val line_break: len:int -> string -> string list
+val line_break : len:int -> string -> string list
 
 (**
    [word_wrap ~soft_limit s]
@@ -61,8 +62,8 @@ val line_break: len:int -> string -> string list
 
    if [nl] is passed it is inserted instead of the normal newline character.
 *)
-val word_wrap:
-  ?trailing_nl:bool
+val word_wrap
+  :  ?trailing_nl:bool
   -> ?soft_limit:int
   -> ?hard_limit:int
   -> ?nl:string
@@ -73,4 +74,4 @@ val word_wrap:
     deletions, and substitutions necessary to turn either string into the other. With the
     [transpose] argument, it alsos considers transpositions (Damerau-Levenshtein
     distance). *)
-val edit_distance : ?transpose : unit -> string -> string -> int
+val edit_distance : ?transpose:unit -> string -> string -> int
