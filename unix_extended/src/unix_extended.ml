@@ -14,6 +14,26 @@ external raw_fork_exec :
   -> Pid.t
   =  "extended_ml_spawn_bc" "extended_ml_spawn"
 
+let raw_fork_exec
+      ~stdin ~stdout ~stderr ?working_dir ?setuid ?setgid ?env prog argv =
+  (* [spawn] is generally preferred: it seems better tested and more actively maintained.
+     It also uses [vfork] so it's more efficient. For now we still must fall back to
+     [extended_ml_spawn] for the case when [setuid] or [setgid] is requested,
+     but we should completely switch to [spawn] when/if it supports that. *)
+  match setuid, setgid with
+  | None, None ->
+    (let env = Option.map ~f:(fun env -> Spawn.Env.of_list (Array.to_list env)) env in
+     let cwd =
+       Option.value_map ~default:Spawn.Working_dir.Inherit
+         ~f:(fun cwd -> Path cwd) working_dir
+     in
+     let argv = Array.to_list argv in
+     Pid.of_int (Spawn.spawn ?env ~cwd ~prog ~argv ~stdin ~stdout ~stderr ()))
+  | Some _, _ | _, Some _ ->
+    raw_fork_exec
+      ~stdin ~stdout ~stderr ?working_dir ?setuid ?setgid ?env prog argv
+
+
 module Env = struct
   open String.Map
   type t = string String.Map.t

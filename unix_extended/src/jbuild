@@ -3,7 +3,9 @@
   (public_name shell.unix_extended)
   (libraries (core
               re2
-              shell_internal))
+              shell_internal
+              spawn
+              ))
   (preprocessor_deps (config.h))
   (c_names (fork_exec
             unix_extended_stubs))
