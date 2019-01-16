@@ -72,6 +72,6 @@ val word_wrap
 
 (** Gives the Levenshtein distance between 2 strings, which is the number of insertions,
     deletions, and substitutions necessary to turn either string into the other. With the
-    [transpose] argument, it alsos considers transpositions (Damerau-Levenshtein
+    [transpose] argument, it also considers transpositions (Damerau-Levenshtein
     distance). *)
 val edit_distance : ?transpose:unit -> string -> string -> int
