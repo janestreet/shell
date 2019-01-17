@@ -1,4 +1,4 @@
 (library (name shell) (public_name shell)
  (preprocess (pps ppx_jane -dont-check-doc-comments-attachment))
- (libraries textutils.console core filename_extended low_level_process re2
-  shell_internal string_extended unix_extended))
+ (libraries textutils.console core low_level_process re2 shell_internal
+  unix_extended))
