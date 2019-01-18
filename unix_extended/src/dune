@@ -3,4 +3,4 @@
  (c_names fork_exec unix_extended_stubs) (preprocess (pps ppx_jane)))
 
 (rule (targets config.h) (deps)
- (action (bash "cp %{lib:core_kernel.config_h:config.h} %{targets}")))
+ (action (bash "cp %{lib:config_h:config.h} %{targets}")))
