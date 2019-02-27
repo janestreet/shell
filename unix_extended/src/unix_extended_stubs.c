@@ -112,6 +112,7 @@ CAMLprim value getloadavg_stub (value v_unit __unused)
 
 #elif defined (_LINUX_QUOTA_VERSION) && _LINUX_QUOTA_VERSION < 2
 
+#include <linux/fs.h> /* needed to build with musl */
 #  define quota_control(device, cmd, id, parg)  \
      quotactl((cmd), (device), (id), (parg))
 #  define QUOTA_BYTES_PER_SPACE_UNIT BLOCK_SIZE
@@ -121,6 +122,7 @@ CAMLprim value getloadavg_stub (value v_unit __unused)
 
 #else /* _LINUX_QUOTA_VERSION >= 2 or not defined, GLIBC 2.25+ */
 
+#include <linux/fs.h> /* needed to build with musl */
 #  define quota_control(device, cmd, id, parg)  \
      quotactl((cmd), (device), (id), (parg))
 #  define QUOTA_BYTES_PER_SPACE_UNIT BLOCK_SIZE
