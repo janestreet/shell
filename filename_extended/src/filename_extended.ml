@@ -1,5 +1,6 @@
 open Core
 open Filename
+open Poly
 
 (** Path *)
 
@@ -146,15 +147,15 @@ let create_extension_map l =
       | idx::_ ->
         List.foldi l
           ~f:(fun pos map v ->
-            if Map.mem map v then
+            if Core.Map.mem map v then
               failwithf "Extension %s is defined twice" v ();
-            Map.set map
+            Core.Map.set map
               ~key:v
               ~data:(idx,pos)
           )
           ~init
     )
-    ~init:Map.Poly.empty
+    ~init:Map.empty
 
 let extension_cmp map h1 h2 =
   let lookup e =
