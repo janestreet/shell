@@ -184,7 +184,7 @@ end
 external strptime : fmt:string -> string -> Unix.tm = "unix_strptime"
 
 module Inet_port = struct
-  type t = int [@@deriving sexp]
+  type t = int [@@deriving compare, equal, sexp]
 
   let of_int_exn x =
     if x > 0 && x < 65536 then
@@ -283,9 +283,9 @@ module Quota = struct
   let inodes x = x
 
   type 'units limit = {
-    soft  : 'units sexp_option;
-    hard  : 'units sexp_option;
-    grace : Time.t sexp_option;
+    soft  : 'units option [@sexp.option];
+    hard  : 'units option [@sexp.option];
+    grace : Time.t option [@sexp.option];
   } [@@deriving sexp]
 
   type 'units usage = private 'units
@@ -350,8 +350,8 @@ module Mount_entry = struct
     directory  : string;
     fstype     : string;
     options    : string;
-    dump_freq  : int sexp_option;
-    fsck_pass  : int sexp_option;
+    dump_freq  : int option [@sexp.option];
+    fsck_pass  : int option [@sexp.option];
   } [@@deriving sexp, fields]
 
   let escape_seqs = [ "040", " " ;

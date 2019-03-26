@@ -111,6 +111,8 @@ external strptime : fmt:string -> string -> Unix.tm = "unix_strptime"
 module Inet_port : sig
   type t [@@deriving sexp]
 
+  val equal : t -> t -> bool
+
   val of_int : int -> t option
   val of_int_exn : int -> t
 
