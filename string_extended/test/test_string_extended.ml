@@ -1,4 +1,5 @@
 open Core
+open Poly
 open Quickcheck_deprecated
 
 let ( @? ) name bool = if not bool then print_s [%message name]

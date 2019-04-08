@@ -1,4 +1,5 @@
 open Core_kernel
+open Poly
 
 (* Natural ordering like found in gnome nautilus, the mac finder etc...
    Refer to Mli for more documentation

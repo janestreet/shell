@@ -1,4 +1,5 @@
 open Core
+open Poly
 
 let extra_path = ref ["/bin";"/usr/bin";"/usr/local/bin"]
 

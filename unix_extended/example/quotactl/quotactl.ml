@@ -1,4 +1,5 @@
 open Core
+open Poly
 module Quota = Unix_extended.Quota
 
 let id_kind_and_lookup = function

@@ -1,4 +1,5 @@
 open Core
+open Poly
 module Sys = Caml.Sys
 
 let rec temp_failure_retry f =
