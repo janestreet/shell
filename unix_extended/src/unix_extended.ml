@@ -185,7 +185,7 @@ end
 external strptime : fmt:string -> string -> Unix.tm = "unix_strptime"
 
 module Inet_port = struct
-  type t = int [@@deriving compare, equal, sexp]
+  type t = int [@@deriving compare, equal, sexp, hash]
 
   let of_int_exn x =
     if x > 0 && x < 65536 then

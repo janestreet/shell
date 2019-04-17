@@ -109,7 +109,7 @@ external strptime : fmt:string -> string -> Unix.tm = "unix_strptime"
 
 (** Simple int wrapper to be explicit about ports. *)
 module Inet_port : sig
-  type t [@@deriving sexp]
+  type t [@@deriving sexp, compare, hash]
 
   val equal : t -> t -> bool
 
