@@ -313,14 +313,14 @@ module Quota = struct
 
   external quota_query
     : [ `User | `Group ]
-      -> id:int
+    -> id:int
     -> path:string
     -> ( bytes c_limit * bytes usage * inodes c_limit * inodes usage)
     = "quota_query"
 
   external quota_modify
     : [ `User | `Group ]
-      -> id:int
+    -> id:int
     -> path:string
     -> bytes  c_limit
     -> inodes c_limit
