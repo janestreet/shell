@@ -25,8 +25,7 @@ let collate s1 s2 =
       | Some _, None -> 1
       | None, Some _ -> -1
       | None, None -> 0
-      | Some c1, Some c2
-        when c1 = c2 -> loop ()
+      | Some c1, Some c2 when c1 = c2 -> loop ()
       | Some c1, Some c2 -> Char.compare c1 c2
     in
     loop ()
@@ -48,15 +47,13 @@ let collate s1 s2 =
       match next ~ok s1 pos1, next ~ok s2 pos2 with
       | Some _, None -> 1
       | None, Some _ -> -1
-      | None, None
-        when !bias <> 0 -> !bias
+      | None, None when !bias <> 0 -> !bias
       | None, None ->
         (* Both ints have the same value, The one with the shortest
            representation (i.e. the least trailing zeroes) is
            considered to be the smallest*)
         !pos1 - !pos2
-      | Some c1, Some c2
-        when !bias = 0 ->
+      | Some c1, Some c2 when !bias = 0 ->
         bias := Char.compare c1 c2;
         loop ()
       | Some _, Some _ -> loop ()
@@ -71,11 +68,9 @@ let collate s1 s2 =
     let r = compare_non_numerical () in
     let r' = compare_numerical () in
     match r, r' with
-    | 0, 0
-      when !pos1 = s1_length && !pos2 = s2_length -> 0
+    | 0, 0 when !pos1 = s1_length && !pos2 = s2_length -> 0
     | 0, 0 -> loop ()
-    | 0, i
-    | i, _ -> i
+    | 0, i | i, _ -> i
   in
   loop ()
 ;;
@@ -178,8 +173,7 @@ let unescaped' ?(strict = true) s =
             let c1 = consume () in
             let c2 = consume () in
             emit_code ((16 * c2hex c1) + c2hex c2)
-          | c
-            when Char.is_digit c ->
+          | c when Char.is_digit c ->
             let char_to_num c =
               match Char.get_digit c with
               | None -> error (Printf.sprintf "expected digit,got: %c" c)
@@ -191,8 +185,7 @@ let unescaped' ?(strict = true) s =
             emit_code ((100 * i1) + (10 * i2) + i3)
           | c -> error (Printf.sprintf "got invalid escape character: %c" c)
         with
-        | Unescape_error (false, _, _)
-          when not strict ->
+        | Unescape_error (false, _, _) when not strict ->
           emit '\\';
           pos := mark);
       loop ())
@@ -285,18 +278,17 @@ let line_break ~len s =
         else acc
       in
       List.rev acc
-    | h :: t
-      when Buffer.length buf = 0 ->
+    | h :: t when Buffer.length buf = 0 ->
       Buffer.add_string buf h;
       loop acc t
-    | h :: t
-      when Buffer.length buf + 1 + String.length h < len ->
+    | h :: t when Buffer.length buf + 1 + String.length h < len ->
       Buffer.add_char buf ' ';
       Buffer.add_string buf h;
       loop acc t
     | l -> loop (flush_buf () :: acc) l
   in
-  List.concat_map (String.split ~on:'\n' s) ~f:(fun s -> loop [] (String.split ~on:' ' s))
+  List.concat_map (String.split ~on:'\n' s) ~f:(fun s ->
+    loop [] (String.split ~on:' ' s))
 ;;
 
 (* Finds out where to break a given line; returns the len of the line to break
@@ -311,8 +303,7 @@ let rec word_wrap__break_one ~hard_limit ~soft_limit ~previous_match s ~pos ~len
   else (
     match s.[pos] with
     (* Detect \r\n as one newline and not two... *)
-    | '\r'
-      when pos < String.length s - 1 && s.[pos + 1] = '\n' -> len, pos + 2
+    | '\r' when pos < String.length s - 1 && s.[pos + 1] = '\n' -> len, pos + 2
     | '\r' | '\n' -> len, pos + 1
     | ' ' | '\t' ->
       word_wrap__break_one
@@ -354,8 +345,7 @@ let word_wrap
   let soft_limit = min soft_limit hard_limit in
   let lines = word_wrap__find_substrings ~soft_limit ~hard_limit s [] 0 in
   match lines with
-  | []
-  | [ _ ] -> if trailing_nl then s ^ nl else s
+  | [] | [ _ ] -> if trailing_nl then s ^ nl else s
   | (hpos, hlen) :: t ->
     let nl_len = String.length nl in
     let body_len =

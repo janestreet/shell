@@ -34,14 +34,17 @@ val unescaped : ?strict:bool -> string -> string
 *)
 val unescaped_res : ?strict:bool -> string -> (string, int * string) Result.t
 
+
 (** [squeeze str] reduces all sequences of spaces, newlines, tabs, and carriage
     returns to single spaces.
 *)
 val squeeze : string -> string
 
+
 (** Use Core.String.is_substring instead of this function.
     This wrapper is here (for now) to maintain bug compatibility. *)
 val is_substring_deprecated : substring:string -> string -> bool
+
 
 (** [pad_left ~char s len]
     Returns [s] padded to the length [len] by adding characters [char] to the
