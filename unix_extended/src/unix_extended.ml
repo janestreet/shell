@@ -182,7 +182,7 @@ module Extended_passwd = struct
   let of_passwd_file f = Option.try_with (fun () -> of_passwd_file_exn f) ;;
 end
 
-external strptime : fmt:string -> string -> Unix.tm = "unix_strptime"
+let strptime = Core.Unix.strptime
 
 module Inet_port = struct
   type t = int [@@deriving compare, equal, sexp, hash]

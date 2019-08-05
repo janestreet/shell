@@ -103,7 +103,8 @@ module Extended_passwd : sig
   val of_passwd_file_exn : string -> t list
 end
 
-external strptime : fmt:string -> string -> Unix.tm = "unix_strptime"
+val strptime : fmt:string -> string -> Unix.tm
+[@@deprecated "[since 2019-07] use Core.Unix.strptime"]
 
 (** The CIDR module moved into Core.Unix *)
 
