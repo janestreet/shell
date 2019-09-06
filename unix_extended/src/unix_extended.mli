@@ -1,19 +1,6 @@
-open! Core
 (** Extensions to [Core.Unix]. *)
+open! Core
 
-val fork_exec :
-  ?stdin:Unix.File_descr.t ->
-  ?stdout:Unix.File_descr.t ->
-  ?stderr:Unix.File_descr.t ->
-  ?path_lookup:bool ->
-  ?env:[ `Extend of (string * string) list
-       | `Replace of (string * string) list ] ->
-  ?working_dir:string ->
-  ?setuid:int ->
-  ?setgid:int ->
-  string ->
-  string list ->
-  Pid.t
 (** [fork_exec prog args ~stdin ~stdout ~stderr ~setuid ~setgid]
     forks a new process that executes the program
     in file [prog], with arguments [args]. The pid of the new
@@ -56,9 +43,20 @@ val fork_exec :
     automatically on EINTR it might prevent the OCaml signal handlers to run in
     that thread.
 *)
+val fork_exec
+  :  ?stdin:Unix.File_descr.t
+  -> ?stdout:Unix.File_descr.t
+  -> ?stderr:Unix.File_descr.t
+  -> ?path_lookup:bool
+  -> ?env:[ `Extend of (string * string) list | `Replace of (string * string) list ]
+  -> ?working_dir:string
+  -> ?setuid:int
+  -> ?setgid:int
+  -> string
+  -> string list
+  -> Pid.t
 
 val seteuid : int -> unit
-
 val setreuid : uid:int -> euid:int -> unit
 
 (** Network to host order long, like C. *)
@@ -67,19 +65,20 @@ external ntohl : Int32.t -> Int32.t = "extended_ml_ntohl"
 (** Host to network order long, like C. *)
 external htonl : Int32.t -> Int32.t = "extended_ml_htonl"
 
-type statvfs = {
-  bsize: int;                           (** file system block size *)
-  frsize: int;                          (** fragment size *)
-  blocks: int;                          (** size of fs in frsize units *)
-  bfree: int;                           (** # free blocks *)
-  bavail: int;                          (** # free blocks for non-root *)
-  files: int;                           (** # inodes *)
-  ffree: int;                           (** # free inodes *)
-  favail: int;                          (** # free inodes for non-root *)
-  fsid: int;                            (** file system ID *)
-  flag: int;                            (** mount flags *)
-  namemax: int;                         (** maximum filename length *)
-} [@@deriving sexp, bin_io]
+type statvfs =
+  { bsize : int (** file system block size *)
+  ; frsize : int (** fragment size *)
+  ; blocks : int (** size of fs in frsize units *)
+  ; bfree : int (** # free blocks *)
+  ; bavail : int (** # free blocks for non-root *)
+  ; files : int (** # inodes *)
+  ; ffree : int (** # free inodes *)
+  ; favail : int (** # free inodes for non-root *)
+  ; fsid : int (** file system ID *)
+  ; flag : int (** mount flags *)
+  ; namemax : int (** maximum filename length *)
+  }
+[@@deriving sexp, bin_io]
 
 (** get file system statistics *)
 external statvfs : string -> statvfs = "statvfs_stub"
@@ -113,28 +112,28 @@ module Inet_port : sig
   type t [@@deriving sexp, compare, hash]
 
   val equal : t -> t -> bool
-
   val of_int : int -> t option
   val of_int_exn : int -> t
-
   val of_string : string -> t option
   val of_string_exn : string -> t
-
   val to_int : t -> int
-  val to_string: t -> string
-
+  val to_string : t -> string
 end
 
 (* MAC-48 (Ethernet) adddresses *)
 module Mac_address : sig
   type t [@@deriving sexp, bin_io]
+
   val equal : t -> t -> bool
+
   (* Supports standard "xx:xx:xx:xx:xx:xx", "xx-xx-xx-xx-xx-xx", and cisco
      "xxxx.xxxx.xxxx" representations. *)
   val of_string : string -> t
+
   (* To standard representation "xx:xx:xx:xx:xx:xx".  Note the hex chars
      will be downcased! *)
   val to_string : t -> string
+
   (* To cisco representation "xxxx.xxxx.xxxx" *)
   val to_string_cisco : t -> string
 
@@ -142,18 +141,18 @@ module Mac_address : sig
 end
 
 module Quota : sig
-
-  type bytes  = private Int63.t [@@deriving sexp]
+  type bytes = private Int63.t [@@deriving sexp]
   type inodes = private Int63.t [@@deriving sexp]
 
-  val bytes  : Int63.t -> bytes
+  val bytes : Int63.t -> bytes
   val inodes : Int63.t -> inodes
 
-  type 'units limit = {
-    soft  : 'units option;
-    hard  : 'units option;
-    grace : Time.t option;
-  } [@@deriving sexp]
+  type 'units limit =
+    { soft : 'units option
+    ; hard : 'units option
+    ; grace : Time.t option
+    }
+  [@@deriving sexp]
 
   type 'units usage = private 'units
 
@@ -161,14 +160,13 @@ module Quota : sig
     :  [ `User | `Group ]
     -> id:int
     -> path:string
-    -> ( bytes  limit * bytes usage
-         * inodes limit * inodes usage) Or_error.t
+    -> (bytes limit * bytes usage * inodes limit * inodes usage) Or_error.t
 
   val set
-    : [ `User | `Group ]
+    :  [ `User | `Group ]
     -> id:int
     -> path:string
-    -> bytes  limit
+    -> bytes limit
     -> inodes limit
     -> unit Or_error.t
 end
@@ -178,14 +176,12 @@ module Mount_entry : sig
   type t [@@deriving sexp]
 
   val parse_line : string -> t option Or_error.t
-
-  val fsname    : t -> string
+  val fsname : t -> string
   val directory : t -> string
-  val fstype    : t -> string
-  val options   : t -> string
+  val fstype : t -> string
+  val options : t -> string
   val dump_freq : t -> int option
   val fsck_pass : t -> int option
-
   val visible_filesystem : t list -> t String.Map.t
 end
 

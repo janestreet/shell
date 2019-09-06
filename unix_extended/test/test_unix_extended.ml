@@ -13,19 +13,20 @@ let%expect_test "[Mount_entry.parse_line]" =
     ; " # space then comment"
     ; "    "
     ; "LABEL=boot /boot ext4 defaults 0"
-    ; "missing_escape \\999 xfs defaults"
-    (* Errors follow *)
+    ; "missing_escape \\999 xfs defaults" (* Errors follow *)
     ; "almost enough fields"
     ; "even fewer"
     ; "just_one"
     ; "\\"
     ]
     ~f:(fun input ->
-      print_s [%message
-        ""
-          (input : string)
-          ~output:(Mount_entry.parse_line input : Mount_entry.t option Or_error.t)]);
-  [%expect {|
+      print_s
+        [%message
+          ""
+            (input : string)
+            ~output:(Mount_entry.parse_line input : Mount_entry.t option Or_error.t)]);
+  [%expect
+    {|
     ((input "/dev/mapper/vg01-root / ext4 defaults 0 0")
      (output (
        Ok ((
@@ -84,7 +85,7 @@ let%expect_test "[Mount_entry.parse_line]" =
     ((input "even fewer")
      (output (Error ("wrong number of fields" "even fewer"))))
     ((input just_one) (output (Error ("wrong number of fields" just_one))))
-    ((input \) (output (Error ("wrong number of fields" \)))) |}];
+    ((input \) (output (Error ("wrong number of fields" \)))) |}]
 ;;
 
 let%expect_test "[Mount_entry.visible_filesystem]" =
@@ -96,12 +97,14 @@ let%expect_test "[Mount_entry.visible_filesystem]" =
       ; "/dev/mapper/vg01-var /var ext4 rw 0 0"
       ; "/dev/mapper/vg01-tmp /tmp ext4 rw 0 0"
       ; "/dev/mapper/vg01-swap swap swap rw 0 0"
-      ; "some-server1:/some/mount/point /mnt/something/else nfs some-option,ro,vers=3,hard,intr 0 0"
+      ; "some-server1:/some/mount/point /mnt/something/else nfs \
+         some-option,ro,vers=3,hard,intr 0 0"
       ]
   in
   let visible_filesystem = Mount_entry.visible_filesystem mount_entries in
   print_s ([%sexp_of: Mount_entry.t String.Map.t] visible_filesystem);
-  [%expect {|
+  [%expect
+    {|
     ((/ (
        (fsname    /dev/mapper/vg01-root)
        (directory /)
