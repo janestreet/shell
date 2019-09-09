@@ -1,3 +1,44 @@
+module Stable0 = struct
+  open Core.Core_stable
+
+  module Inet_port = struct
+    module V1 = struct
+      type t = int [@@deriving compare, equal, hash]
+
+      let of_int_exn x =
+        if x > 0 && x < 65536
+        then x
+        else failwith (Core.sprintf "%d is not a valid port number." x)
+      ;;
+
+      let to_int x = x
+
+      include Sexpable.Of_sexpable.V1
+          (Int.V1)
+          (struct
+            type nonrec t = t
+
+            let of_sexpable = of_int_exn
+            let to_sexpable = to_int
+          end)
+
+      include Binable.Of_binable.V1
+          (Int.V1)
+          (struct
+            type nonrec t = t
+
+            let of_binable = of_int_exn
+            let to_binable = to_int
+          end)
+
+      let%expect_test _ =
+        print_string [%bin_digest: t];
+        [%expect {| 698cfa4093fe5e51523842d37b92aeac |}]
+      ;;
+    end
+  end
+end
+
 open Core
 open Poly
 open Unix
@@ -182,13 +223,11 @@ end
 let strptime = Core.Unix.strptime
 
 module Inet_port = struct
-  type t = int [@@deriving compare, equal, sexp, hash]
+  module Stable = Stable0.Inet_port
 
-  let of_int_exn x =
-    if x > 0 && x < 65536
-    then x
-    else failwith (sprintf "%d is not a valid port number." x)
-  ;;
+  type t = int [@@deriving compare, equal, hash]
+
+  let of_int_exn = Stable.V1.of_int_exn
 
   let of_int x =
     try Some (of_int_exn x) with
@@ -204,9 +243,8 @@ module Inet_port = struct
 
   let to_string x = Int.to_string x
   let to_int x = x
-  let t_of_sexp sexp = String.t_of_sexp sexp |> of_string_exn
-  let sexp_of_t t = to_string t |> String.sexp_of_t
-  let _flag = Command.Spec.Arg_type.create of_string_exn
+  let sexp_of_t = Stable.V1.sexp_of_t
+  let arg_type = Command.Spec.Arg_type.create of_string_exn
 end
 
 let%test _ = Inet_port.of_string "88" = Some 88

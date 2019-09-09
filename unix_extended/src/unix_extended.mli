@@ -109,7 +109,7 @@ val strptime : fmt:string -> string -> Unix.tm
 
 (** Simple int wrapper to be explicit about ports. *)
 module Inet_port : sig
-  type t [@@deriving sexp, compare, hash]
+  type t [@@deriving sexp_of, compare, hash]
 
   val equal : t -> t -> bool
   val of_int : int -> t option
@@ -118,6 +118,11 @@ module Inet_port : sig
   val of_string_exn : string -> t
   val to_int : t -> int
   val to_string : t -> string
+  val arg_type : t Command.Arg_type.t
+
+  module Stable : sig
+    module V1 : Stable_without_comparator with type t = t
+  end
 end
 
 (* MAC-48 (Ethernet) adddresses *)
