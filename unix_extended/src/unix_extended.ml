@@ -3,38 +3,45 @@ module Stable0 = struct
 
   module Inet_port = struct
     module V1 = struct
-      type t = int [@@deriving compare, equal, hash]
+      module T = struct
+        type t = int [@@deriving compare, equal, hash]
 
-      let of_int_exn x =
-        if x > 0 && x < 65536
-        then x
-        else failwith (Core.sprintf "%d is not a valid port number." x)
-      ;;
+        let of_int_exn x =
+          if x > 0 && x < 65536
+          then x
+          else failwith (Core.sprintf "%d is not a valid port number." x)
+        ;;
 
-      let to_int x = x
+        let to_int x = x
 
-      include Sexpable.Of_sexpable.V1
-          (Int.V1)
-          (struct
-            type nonrec t = t
+        include Sexpable.Of_sexpable.V1
+            (Int.V1)
+            (struct
+              type nonrec t = t
 
-            let of_sexpable = of_int_exn
-            let to_sexpable = to_int
-          end)
+              let of_sexpable = of_int_exn
+              let to_sexpable = to_int
+            end)
 
-      include Binable.Of_binable.V1
-          (Int.V1)
-          (struct
-            type nonrec t = t
+        include Binable.Of_binable.V1
+            (Int.V1)
+            (struct
+              type nonrec t = t
 
-            let of_binable = of_int_exn
-            let to_binable = to_int
-          end)
+              let of_binable = of_int_exn
+              let to_binable = to_int
+            end)
 
-      let%expect_test _ =
-        print_string [%bin_digest: t];
-        [%expect {| 698cfa4093fe5e51523842d37b92aeac |}]
-      ;;
+        include (val Comparator.V1.make ~compare ~sexp_of_t)
+
+        let%expect_test _ =
+          print_string [%bin_digest: t];
+          [%expect {| 698cfa4093fe5e51523842d37b92aeac |}]
+        ;;
+      end
+
+      include T
+      include Comparable.V1.Make (T)
     end
   end
 end
@@ -225,7 +232,15 @@ let strptime = Core.Unix.strptime
 module Inet_port = struct
   module Stable = Stable0.Inet_port
 
-  type t = int [@@deriving compare, equal, hash]
+  module T = struct
+    type t = int [@@deriving compare, equal, hash]
+    type comparator_witness = Stable.V1.comparator_witness
+
+    let comparator = Stable.V1.comparator
+    let sexp_of_t = Stable.V1.sexp_of_t
+  end
+
+  include T
 
   let of_int_exn = Stable.V1.of_int_exn
 
@@ -243,8 +258,9 @@ module Inet_port = struct
 
   let to_string x = Int.to_string x
   let to_int x = x
-  let sexp_of_t = Stable.V1.sexp_of_t
   let arg_type = Command.Spec.Arg_type.create of_string_exn
+
+  include Comparable.Make_plain_using_comparator (T)
 end
 
 let%test _ = Inet_port.of_string "88" = Some 88

@@ -111,7 +111,6 @@ val strptime : fmt:string -> string -> Unix.tm
 module Inet_port : sig
   type t [@@deriving sexp_of, compare, hash]
 
-  val equal : t -> t -> bool
   val of_int : int -> t option
   val of_int_exn : int -> t
   val of_string : string -> t option
@@ -120,8 +119,13 @@ module Inet_port : sig
   val to_string : t -> string
   val arg_type : t Command.Arg_type.t
 
+  include Comparable.S_plain with type t := t
+
   module Stable : sig
-    module V1 : Stable_without_comparator with type t = t
+    module V1 :
+      Stable_comparable.V1
+      with type t = t
+       and type comparator_witness = comparator_witness
   end
 end
 
