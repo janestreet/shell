@@ -276,10 +276,14 @@ module Mac_address = struct
 
     let ( = ) = String.( = )
     let equal = ( = )
-    let rex = Re2.create_exn "[^a-f0-9]"
 
     let of_string s =
-      let addr = String.lowercase s |> Re2.rewrite_exn rex ~template:"" in
+      let addr =
+        String.lowercase s
+        |> String.filter ~f:(function
+          | 'a' .. 'f' | '0' .. '9' -> true
+          | _ -> false)
+      in
       let length = String.length addr in
       if length <> 12
       then failwithf "MAC address '%s' has the wrong length: %d" s length ();

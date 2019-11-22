@@ -15,7 +15,6 @@ depends: [
   "core_kernel"
   "jst-config"
   "ppx_jane"
-  "re2"
   "textutils"
   "dune"        {>= "1.5.1"}
   "spawn"       {>= "v0.12"}
