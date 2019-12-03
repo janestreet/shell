@@ -16,7 +16,7 @@ depends: [
   "jst-config"
   "ppx_jane"
   "textutils"
-  "dune"        {>= "1.5.1"}
+  "dune"        {>= "2.0.0"}
   "spawn"       {>= "v0.12"}
 ]
 synopsis: "Yet another implementation of fork&exec and related functionality"
