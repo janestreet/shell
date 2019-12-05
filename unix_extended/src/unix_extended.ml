@@ -23,7 +23,7 @@ module Stable0 = struct
               let to_sexpable = to_int
             end)
 
-        include Binable.Of_binable.V1
+        include Binable.Of_binable.V1 [@alert "-legacy"]
             (Int.V1)
             (struct
               type nonrec t = t
