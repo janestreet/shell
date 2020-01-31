@@ -21,8 +21,7 @@ open! Core
    - [verbose]        : prints the output of the command
    - [echo]           : print out the command before running it
    - [input]          : a string to pipe through the program's standard in
-   - [export]         : a list of variable to export in the environement of the
-     dispatched program
+   - [env]            : controls the environment variables passed to the command
    - [preserve_euid]  : pass the '-p' option to bash when running the command; this should
      disable the default bash behavior of replacing the effective user
      ID with the current value of the real user ID, useful in programs
