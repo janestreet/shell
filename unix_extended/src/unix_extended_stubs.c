@@ -14,6 +14,7 @@
 #include <sys/statvfs.h>
 
 #if defined (__FreeBSD__) || defined (__OpenBSD__)
+#include <sys/param.h>
 #include <ufs/ufs/quota.h>
 #else
 #include <sys/quota.h>
