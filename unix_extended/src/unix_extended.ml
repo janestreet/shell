@@ -109,8 +109,8 @@ module Env = struct
     else if String.mem key '\000'
     then
       failwithf
-        "extended_unix.Env.add:variable to export in the environment %S contains an \
-         null character"
+        "extended_unix.Env.add:variable to export in the environment %S contains an null \
+         character"
         key
         ()
     else if String.mem data '\000'

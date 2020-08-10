@@ -287,8 +287,7 @@ let line_break ~len s =
       loop acc t
     | l -> loop (flush_buf () :: acc) l
   in
-  List.concat_map (String.split ~on:'\n' s) ~f:(fun s ->
-    loop [] (String.split ~on:' ' s))
+  List.concat_map (String.split ~on:'\n' s) ~f:(fun s -> loop [] (String.split ~on:' ' s))
 ;;
 
 (* Finds out where to break a given line; returns the len of the line to break
@@ -348,9 +347,7 @@ let word_wrap
   | [] | [ _ ] -> if trailing_nl then s ^ nl else s
   | (hpos, hlen) :: t ->
     let nl_len = String.length nl in
-    let body_len =
-      List.fold_left t ~f:(fun acc (_, len) -> acc + nl_len + len) ~init:0
-    in
+    let body_len = List.fold_left t ~f:(fun acc (_, len) -> acc + nl_len + len) ~init:0 in
     let res_len = if trailing_nl then body_len + hlen + nl_len else body_len + hlen in
     let res = Bytes.create res_len in
     if trailing_nl
