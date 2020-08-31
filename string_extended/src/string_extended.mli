@@ -78,3 +78,6 @@ val word_wrap
     [transpose] argument, it also considers transpositions (Damerau-Levenshtein
     distance). *)
 val edit_distance : ?transpose:unit -> string -> string -> int
+
+(** [not_empty_opt string] returns [None] if the string is empty, [Some string] otherwise. *)
+val not_empty_opt : string -> string option

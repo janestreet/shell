@@ -453,3 +453,8 @@ let%test _ = edit_distance ~transpose:() "sitting" "kitten" = 3
 let%test _ = edit_distance "abcdef" "1234567890" = 10
 let%test _ = edit_distance "foobar" "fubahr" = 3
 let%test _ = edit_distance "hylomorphism" "zylomorphism" = 1
+
+let not_empty_opt = function
+  | "" -> None
+  | s -> Some s
+;;
