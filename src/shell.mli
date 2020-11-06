@@ -26,6 +26,8 @@ open! Core
      disable the default bash behavior of replacing the effective user
      ID with the current value of the real user ID, useful in programs
      where privileges are escalated and de-escalated using seteuid(2)
+   - [strict_errors]  : pass '-eu -o pipefail' options to bash when running the
+     command
 
 
    WARNING: the input argument to this function should not be used because
@@ -146,19 +148,21 @@ val run_fold  :
 
 type ('a,'ret) sh_cmd = ('a, unit, string,'ret) format4 -> 'a
 
-val sh       : ('a,unit)          sh_cmd with_run_flags
-val sh_lines : ('a,string list)   sh_cmd with_run_flags
-val sh_full  : ('a,string)        sh_cmd with_run_flags
-val sh_one   : ('a,string option) sh_cmd with_run_flags
+type 'a with_sh_flags = ?strict_errors:bool -> 'a
+
+val sh       : ('a,unit)          sh_cmd with_run_flags with_sh_flags
+val sh_lines : ('a,string list)   sh_cmd with_run_flags with_sh_flags
+val sh_full  : ('a,string)        sh_cmd with_run_flags with_sh_flags
+val sh_one   : ('a,string option) sh_cmd with_run_flags with_sh_flags
 [@@deprecated "[since 2017-11] Use [sh_one_line] to get a different behavior or \
                [sh_first_line] to get the old behavior"]
-val sh_one_exn : ('a,string) sh_cmd with_run_flags
+val sh_one_exn : ('a,string) sh_cmd with_run_flags with_sh_flags
 [@@deprecated "[since 2017-11] Use [sh_one_line_exn] to get a different behavior or \
                [sh_first_line_exn] to get the old behavior"]
-val sh_one_line       : ('a,string Or_error.t) sh_cmd with_run_flags
-val sh_one_line_exn   : ('a,string)            sh_cmd with_run_flags
-val sh_first_line     : ('a,string option)     sh_cmd with_run_flags
-val sh_first_line_exn : ('a,string)            sh_cmd with_run_flags
+val sh_one_line       : ('a,string Or_error.t) sh_cmd with_run_flags with_sh_flags
+val sh_one_line_exn   : ('a,string)            sh_cmd with_run_flags with_sh_flags
+val sh_first_line     : ('a,string option)     sh_cmd with_run_flags with_sh_flags
+val sh_first_line_exn : ('a,string)            sh_cmd with_run_flags with_sh_flags
 
 (* Magic invocation to avoid asking for password if we can.  These arguments are
    passed to ssh in the [ssh_*] functions below.  They're exposed in case you
@@ -208,7 +212,7 @@ type 'a with_test_flags = ?true_v:int list -> ?false_v:int list
 
 val test    : bool cmd with_test_flags
 
-val sh_test : ('a,bool) sh_cmd with_test_flags
+val sh_test : ('a,bool) sh_cmd with_test_flags with_sh_flags
 
 val ssh_test : ('a,bool) sh_cmd with_test_flags with_ssh_flags
 
@@ -249,13 +253,14 @@ module Process : sig
     -> ?verbose:bool
     -> ?echo:bool
     -> ?preserve_euid:bool
+    -> ?strict_errors:bool
     -> unit
     -> unit
 
   val format_failed : result -> string
 
   val cmd    : string -> string list -> t
-  val shell  : string -> t
+  val shell  : ?strict_errors:bool -> string -> t
 
   val make_ssh_command :
     ?ssh_options:string list

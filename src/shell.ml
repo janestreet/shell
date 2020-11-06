@@ -59,22 +59,31 @@ module Process = struct
     let verbose = ref false
     let echo = ref false
     let preserve_euid = ref false
+    let strict_errors = ref false
   end
 
-  let set_defaults ?timeout ?verbose ?echo ?preserve_euid () =
+  let set_defaults ?timeout ?verbose ?echo ?preserve_euid ?strict_errors () =
     Option.iter ~f:(fun v -> Defaults.verbose := v) verbose;
     Option.iter ~f:(fun v -> Defaults.timeout := v) timeout;
     Option.iter ~f:(fun v -> Defaults.echo := v) echo;
-    Option.iter ~f:(fun v -> Defaults.preserve_euid := v) preserve_euid
-
+    Option.iter ~f:(fun v -> Defaults.preserve_euid := v) preserve_euid;
+    Option.iter ~f:(fun v -> Defaults.strict_errors := v) strict_errors
 
   let cmd program arguments = {
     program   = program;
     arguments = arguments;
   }
 
-  let shell s =
-    let addtl_args = if !Defaults.preserve_euid then [ "-p" ] else [] in
+  let shell ?strict_errors s =
+    let addtl_args =
+      let preserve_euid_args = if !Defaults.preserve_euid then [ "-p" ] else [] in
+      let strict_errors_args =
+        if Option.value strict_errors ~default:!Defaults.strict_errors
+        then [ "-e"; "-u"; "-o"; "pipefail" ]
+        else []
+      in
+      preserve_euid_args @ strict_errors_args
+    in
     {
       program   = "/bin/bash";
       arguments = addtl_args @ [ "-c" ; s ]
@@ -371,28 +380,36 @@ let run_fold ?eol ~init ~f  = run_gen (Process.fold_lines ?eol ~init ~f ~flush:F
 let test =
   Process.test_k (fun f prog args -> f (Process.cmd prog args))
 
-let k_shell_command k f fmt =
-  ksprintf (fun command -> k f (Process.shell command)) fmt
+let k_shell_command k f ?strict_errors fmt =
+  ksprintf (fun command -> k f (Process.shell ?strict_errors command)) fmt
 
-let sh_gen reader =
-  Process.run_k (k_shell_command (fun f cmd -> f cmd reader))
+let sh_gen reader ?strict_errors =
+  Process.run_k (k_shell_command ?strict_errors (fun f cmd -> f cmd reader))
 
-let sh                ?expect = sh_gen  Process.discard          ?expect
-let sh_lines          ?expect = sh_gen (Process.lines ())        ?expect
-let sh_full           ?expect = sh_gen  Process.content          ?expect
-let sh_one            ?expect = sh_gen (Process.head ())         ?expect
-let sh_one_exn        ?expect = sh_gen (Process.head_exn ())     ?expect
-let sh_first_line     ?expect = sh_gen (Process.head ())         ?expect
-let sh_first_line_exn ?expect = sh_gen (Process.head_exn ())     ?expect
-let sh_one_line       ?expect = sh_gen (Process.one_line ())     ?expect
-let sh_one_line_exn   ?expect = sh_gen (Process.one_line_exn ()) ?expect
+type 'a with_sh_flags =
+  (* Defaults to [false]*)
+  ?strict_errors:bool -> 'a
+
+let sh                ?strict_errors = sh_gen  Process.discard          ?strict_errors
+let sh_lines          ?strict_errors = sh_gen (Process.lines ())        ?strict_errors
+let sh_full           ?strict_errors = sh_gen  Process.content          ?strict_errors
+let sh_one            ?strict_errors = sh_gen (Process.head ())         ?strict_errors
+let sh_one_exn        ?strict_errors = sh_gen (Process.head_exn ())     ?strict_errors
+let sh_first_line     ?strict_errors = sh_gen (Process.head ())         ?strict_errors
+let sh_first_line_exn ?strict_errors = sh_gen (Process.head_exn ())     ?strict_errors
+let sh_one_line       ?strict_errors = sh_gen (Process.one_line ())     ?strict_errors
+let sh_one_line_exn   ?strict_errors = sh_gen (Process.one_line_exn ()) ?strict_errors
 
 let%test _ =
   sh_lines "yes yes | head -n 200000" =
   List.init 200_000 ~f:(fun _num -> "yes")
 
-let sh_test ?true_v =
-  Process.test_k (k_shell_command (fun f cmd -> f cmd)) ?true_v
+let%test _ =
+  try sh ~strict_errors:true "false | true"; true
+  with Process.Failed _ -> true
+
+let sh_test ?strict_errors =
+  Process.test_k (k_shell_command ?strict_errors (fun f cmd -> f cmd))
 
 type 'a with_ssh_flags =
   ?ssh_options:string list
