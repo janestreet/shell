@@ -274,6 +274,11 @@ module Mac_address = struct
   module T = struct
     type t = string [@@deriving sexp, bin_io, compare, hash]
 
+    let%expect_test _ =
+      print_endline [%bin_digest: t];
+      [%expect {| d9a8da25d5656b016fb4dbdc2e4197fb |}]
+    ;;
+
     let ( = ) = String.( = )
     let equal = ( = )
 
@@ -312,6 +317,26 @@ module Mac_address = struct
     let t_of_sexp sexp = String.t_of_sexp sexp |> of_string
     let sexp_of_t t = to_string t |> String.sexp_of_t
     let _flag = Command.Spec.Arg_type.create of_string
+
+    let%expect_test "t_of_sexp sexp_of_t" =
+      [ "001d0968820f"
+      ; "00:1d:09:68:82:0f"
+      ; "00-1d-09-68-82-0f"
+      ; "001d.0968.820f"
+      ; (* Example of "bad" parsing preserved for backwards compatibility. *)
+        "\"Surprisingly this parses as a valid MAC address\""
+      ]
+      |> List.iter ~f:(fun str ->
+        Sexp.of_string_conv_exn str [%of_sexp: t] |> printf !"%{sexp:t}\n");
+      [%expect
+        {|
+          00:1d:09:68:82:0f
+          00:1d:09:68:82:0f
+          00:1d:09:68:82:0f
+          00:1d:09:68:82:0f
+          ae:aa:ad:ac:ad:de
+        |}]
+    ;;
   end
 
   include T
@@ -333,6 +358,13 @@ let%test _ =
 let%test _ =
   Mac_address.to_string_cisco (Mac_address.of_string "00-1d-09-68-82-0f")
   = "001d.0968.820f"
+;;
+
+(* Example of "bad" parsing preserved for backwards compatibility. *)
+let%test _ =
+  Mac_address.to_string
+    (Mac_address.of_string "Surprisingly this parses as a valid MAC address")
+  = "ae:aa:ad:ac:ad:de"
 ;;
 
 module Quota = struct
