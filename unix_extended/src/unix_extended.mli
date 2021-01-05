@@ -129,25 +129,12 @@ module Inet_port : sig
   end
 end
 
-(* MAC-48 (Ethernet) adddresses *)
-module Mac_address : sig
-  type t [@@deriving sexp, bin_io]
-
-  val equal : t -> t -> bool
-
-  (* Supports standard "xx:xx:xx:xx:xx:xx", "xx-xx-xx-xx-xx-xx", and cisco
-     "xxxx.xxxx.xxxx" representations. *)
-  val of_string : string -> t
-
-  (* To standard representation "xx:xx:xx:xx:xx:xx".  Note the hex chars
-     will be downcased! *)
-  val to_string : t -> string
-
-  (* To cisco representation "xxxx.xxxx.xxxx" *)
-  val to_string_cisco : t -> string
-
-  include Hashable.S with type t := t
-end
+(* the code for [Unix_extended.Mac_address] has been moved to
+   [Mac_address_deprecated] (in lib/mac_address/src/deprecated) *)
+module Mac_address = Nothing
+[@@deprecated
+  "[since 2020-11] New code should use the [Mac_address] library. Existing code can use \
+   [Mac_address_deprecated] as a quick fix (which is an exact drop-in replacement)."]
 
 module Quota : sig
   type bytes = private Int63.t [@@deriving sexp]
