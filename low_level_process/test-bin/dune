@@ -2,5 +2,4 @@
  (action (bash ./%{first_dep})))
 
 (executables (names test_low_level_process)
- (libraries low_level_process oUnit)
- (preprocess (pps ppx_jane -allow-unannotated-ignores)))
+ (libraries low_level_process oUnit) (preprocess (pps ppx_jane)))
