@@ -426,11 +426,12 @@ let edit_distance_matrix ?transpose s1 s2 =
             [ d.(x - 1).(y) + 1; d.(x).(y - 1) + 1; d.(x - 1).(y - 1) + 1 ]
       in
       let min_d =
-        if transpose
-        && x > 1
-        && y > 1
-        && s1.[x - 1] = s2.[y - 2]
-        && s1.[x - 2] = s2.[y - 1]
+        if
+          transpose
+          && x > 1
+          && y > 1
+          && s1.[x - 1] = s2.[y - 2]
+          && s1.[x - 2] = s2.[y - 1]
         then min min_d (d.(x - 2).(y - 2) + 1)
         else min_d
       in
