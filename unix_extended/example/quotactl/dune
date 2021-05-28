@@ -1,2 +1,4 @@
-(executables (names quotactl) (libraries core unix_extended)
+(executables (names quotactl)
+ (libraries core.command_unix core core.filename_unix core.time_unix
+  unix_extended)
  (preprocess (pps ppx_jane)))

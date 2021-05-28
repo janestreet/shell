@@ -50,7 +50,9 @@ end
 
 open Core
 open Poly
+module Unix = Core_unix
 open Unix
+module Time = Time_unix
 
 external raw_fork_exec
   :  stdin:File_descr.t
@@ -229,7 +231,7 @@ module Extended_passwd = struct
   let of_passwd_file f = Option.try_with (fun () -> of_passwd_file_exn f)
 end
 
-let strptime = Core.Unix.strptime
+let strptime = Core_unix.strptime
 
 module Inet_port = struct
   module Stable = Stable0.Inet_port
@@ -464,7 +466,7 @@ let terminal_width =
        stderr not redirected. *)
     (try
        Exn.protectx
-         (Core.Unix.open_process_in
+         (Core_unix.open_process_in
             "/usr/bin/tput cols &> /dev/null && /usr/bin/tput cols")
          ~f:(fun in_channel ->
            In_channel.input_line in_channel |> Option.value_exn |> Int.of_string)

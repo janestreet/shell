@@ -1,5 +1,7 @@
-(** Extensions to [Core.Unix]. *)
+(** Extensions to [Core_unix]. *)
 open! Core
+
+module Unix := Core_unix
 
 (** [fork_exec prog args ~stdin ~stdout ~stderr ~setuid ~setgid]
     forks a new process that executes the program
@@ -103,9 +105,9 @@ module Extended_passwd : sig
 end
 
 val strptime : fmt:string -> string -> Unix.tm
-[@@deprecated "[since 2019-07] use Core.Unix.strptime"]
+[@@deprecated "[since 2019-07] use Core_unix.strptime"]
 
-(** The CIDR module moved into Core.Unix *)
+(** The CIDR module moved into Core_unix *)
 
 (** Simple int wrapper to be explicit about ports. *)
 module Inet_port : sig

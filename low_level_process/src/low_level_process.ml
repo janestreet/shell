@@ -1,5 +1,7 @@
 open Core
 open Poly
+module Unix = Core_unix
+module Time = Time_unix
 module Sys = Caml.Sys
 
 let rec temp_failure_retry f =
@@ -145,7 +147,7 @@ module Status = struct
     | `Exited i -> sprintf "exited with code %d" i
     | `Signaled s ->
       sprintf !"died after receiving %{Signal} (signal number %d)"
-        s (Signal.to_system_int s)
+        s (Signal_unix.to_system_int s)
     | `Timeout s -> sprintf !"Timed out (ran for %{Time.Span})" s
 
 end
@@ -176,7 +178,7 @@ let wait_for_exit ~is_child span pid =
     end else
       (* This is the equivalent of calling the C kill with 0 (test whether a process
          exists) *)
-      match Signal.send (Signal.of_system_int 0) (`Pid pid) with
+      match Signal_unix.send (Signal_unix.of_system_int 0) (`Pid pid) with
       | `Ok -> true
       | `No_such_process -> false
   in
@@ -199,11 +201,11 @@ let kill
       ?(signal = Signal.term)
       pid
   =
-  Signal.send_exn signal (`Pid pid);
+  Signal_unix.send_exn signal (`Pid pid);
   if not (wait_for_exit ~is_child wait_for pid) then begin
     begin
       match
-        Signal.send Signal.kill (`Pid pid)
+        Signal_unix.send Signal.kill (`Pid pid)
       with
       | `No_such_process ->
         if is_child then
@@ -454,7 +456,7 @@ let kill ?is_child ?wait_for ?(signal=Signal.term) pid =
 let%test_module _ = (module struct
   let with_fds n ~f =
     let restore_max_fds =
-      let module RLimit = Core.Unix.RLimit in
+      let module RLimit = Core_unix.RLimit in
       let max_fds = RLimit.get RLimit.num_file_descriptors in
       match max_fds.RLimit.cur with
       | RLimit.Infinity -> None
@@ -468,7 +470,7 @@ let%test_module _ = (module struct
     let retval = Or_error.try_with f in
     List.iter fds ~f:(fun fd -> Unix.close fd);
     Option.iter restore_max_fds ~f:(fun max_fds ->
-      let module RLimit = Core.Unix.RLimit in
+      let module RLimit = Core_unix.RLimit in
       RLimit.set RLimit.num_file_descriptors max_fds);
     Or_error.ok_exn retval
 

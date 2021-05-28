@@ -1,6 +1,7 @@
 open Core
 open Filename
 open Poly
+module Unix = Core_unix
 
 (** Path *)
 
@@ -192,7 +193,7 @@ let extension_map = create_extension_map [["h";"c"];["mli";"ml"]]
 let compare = filename_compare extension_map
 
 let with_open_temp_file ?in_dir ?(write=ignore) ~f prefix suffix =
-  protectx (open_temp_file ?in_dir prefix suffix)
+  protectx (Filename_unix.open_temp_file ?in_dir prefix suffix)
     ~f:(fun (fname,oc) ->
       protectx oc
         ~f:write
@@ -201,6 +202,6 @@ let with_open_temp_file ?in_dir ?(write=ignore) ~f prefix suffix =
     ~finally:(fun (fname,_) -> Unix.unlink fname)
 
 let with_temp_dir ?in_dir prefix suffix ~f =
-  protectx (temp_dir ?in_dir prefix suffix)
+  protectx (Filename_unix.temp_dir ?in_dir prefix suffix)
     ~f
     ~finally:(fun dirname -> ignore (Sys.command (sprintf "rm -rf '%s'" dirname)))

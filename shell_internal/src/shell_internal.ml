@@ -1,5 +1,6 @@
 open Core
 open Poly
+module Unix = Core_unix
 
 let extra_path = ref ["/bin";"/usr/bin";"/usr/local/bin"]
 

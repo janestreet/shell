@@ -2,6 +2,7 @@
    version of process handling.*)
 open Core
 open Poly
+module Unix = Core_unix
 
 module Line_buffer = Shell__line_buffer
 

@@ -1,5 +1,7 @@
 open Core
 open Poly
+module Unix = Core_unix
+module Time = Time_unix
 module Quota = Unix_extended.Quota
 
 let id_kind_and_lookup = function
@@ -16,7 +18,7 @@ module Query = struct
         Command.Spec.(
           step (fun f v -> f ~id:(lookup_id v))
           +> anon (String.uppercase id_kind %: string)
-          +> anon ("DEVICE" %: Filename.arg_type))
+          +> anon ("DEVICE" %: Filename_unix.arg_type))
         (fun ~id device () ->
            let bytes_limit, bytes_usage, inodes_limit, inodes_usage =
              Or_error.ok_exn (Quota.query user_or_group ~id ~path:device)
@@ -83,7 +85,7 @@ module Modify = struct
           +> flag "-inodes-soft" (optional inodes) ~doc:"inode usage soft limit"
           +> flag "-inodes-hard" (optional inodes) ~doc:"inode usage hard limit"
           +> flag "-inodes-grace" (optional grace) ~doc:"inode usage grace period"
-          +> anon ("DEVICE" %: Filename.arg_type))
+          +> anon ("DEVICE" %: Filename_unix.arg_type))
         (fun ~id bsoft bhard bgrace isoft ihard igrace device () ->
            let bytes_limit, _bytes_usage, inodes_limit, _inodes_usage =
              Or_error.ok_exn (Quota.query user_or_group ~id ~path:device)
@@ -120,4 +122,4 @@ let command =
   Command.group ~summary:"Set/query quotas" [ Query.named_command; Modify.named_command ]
 ;;
 
-let () = Exn.handle_uncaught ~exit:true (fun () -> Command.run command)
+let () = Exn.handle_uncaught ~exit:true (fun () -> Command_unix.run command)

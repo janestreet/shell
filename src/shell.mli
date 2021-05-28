@@ -5,6 +5,7 @@
     strictly.
 *)
 open! Core
+module Unix := Core_unix
 
 (** {6 Process handling }  *)
 
