@@ -59,7 +59,7 @@ let path_expand ?use_extra_path prog =
                 ()
     | Some v -> v
   else if Filename.is_relative prog then
-    Sys.getcwd () ^/ prog
+    Sys_unix.getcwd () ^/ prog
   else
     prog
 

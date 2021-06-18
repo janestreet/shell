@@ -104,7 +104,7 @@ module Extended_passwd : sig
   val of_passwd_file_exn : string -> t list
 end
 
-val strptime : fmt:string -> string -> Unix.tm
+val strptime : ?allow_trailing_input:bool -> fmt:string -> string -> Unix.tm
 [@@deprecated "[since 2019-07] use Core_unix.strptime"]
 
 (** The CIDR module moved into Core_unix *)

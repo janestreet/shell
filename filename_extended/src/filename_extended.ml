@@ -50,7 +50,7 @@ let make_relative ?to_ f =
             f
             ();
         dir
-      | None -> Sys.getcwd ()
+      | None -> Sys_unix.getcwd ()
     in
     let rec aux = function
       | (h :: t), (h' :: t') when String.equal h h' -> aux (t,t')
@@ -93,7 +93,7 @@ let (//) src p =
   else
     concat src p
 
-let make_absolute p = Sys.getcwd () // p
+let make_absolute p = Sys_unix.getcwd () // p
 
 let user_home username =
   match Unix.Passwd.getbyname username with
@@ -117,7 +117,7 @@ let expand_user s =
   else
     s
 
-let expand ?(from=".") p = normalize (Sys.getcwd () // from // expand_user p)
+let expand ?(from=".") p = normalize (Sys_unix.getcwd () // from // expand_user p)
 
 let rec is_parent_path p1 p2 =
   match p1, p2 with
@@ -204,4 +204,4 @@ let with_open_temp_file ?in_dir ?(write=ignore) ~f prefix suffix =
 let with_temp_dir ?in_dir prefix suffix ~f =
   protectx (Filename_unix.temp_dir ?in_dir prefix suffix)
     ~f
-    ~finally:(fun dirname -> ignore (Sys.command (sprintf "rm -rf '%s'" dirname)))
+    ~finally:(fun dirname -> ignore (Sys_unix.command (sprintf "rm -rf '%s'" dirname)))

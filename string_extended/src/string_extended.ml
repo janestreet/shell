@@ -1,4 +1,4 @@
-open Core_kernel
+open Core
 open Poly
 
 (* Natural ordering like found in gnome nautilus, the mac finder etc...
@@ -383,7 +383,7 @@ let is_substring_deprecated ~substring:needle haystack =
      to be here. *)
   if String.length needle = 0
   then if String.length haystack = 0 then false else invalid_arg "index out of bounds"
-  else Core_kernel.String.is_substring ~substring:needle haystack
+  else Core.String.is_substring ~substring:needle haystack
 ;;
 
 let%test _ = is_substring_deprecated ~substring:"foo" "foo"

@@ -471,7 +471,7 @@ let cp ?(overwrite=true) ?perm src dst =
     | Some p -> p
     | None -> (Unix.lstat src).Unix.st_perm
   in
-  let dst = if Sys.is_directory dst = `Yes then
+  let dst = if Sys_unix.is_directory dst = `Yes then
       dst ^/ (Filename.basename src)
     else
       dst
