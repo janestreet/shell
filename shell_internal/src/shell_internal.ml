@@ -16,7 +16,7 @@ let get_path ?(use_extra_path=true) () =
     else
       env_path
   in
-  List.stable_dedup path
+  String.Set.stable_dedup_list path
 
 let is_executable path =
   try

@@ -17,7 +17,7 @@ open! Core
 val collate : string -> string -> int
 
 (**
-   [unescaped s] is the inverse operation of [escaped]: it takes a string where
+   [unescaped_exn s] is the inverse operation of [escaped]: it takes a string where
    all the special characters are escaped following the lexical convention of
    OCaml and returns an unescaped copy.
    The [strict] switch is on by default and makes the function treat illegal
@@ -26,13 +26,7 @@ val collate : string -> string -> int
    greater than [255] is copied literally. The aforementioned numerals still
    raise errors. This mimics the behaviour of the ocaml lexer.
 *)
-val unescaped : ?strict:bool -> string -> string
-
-(**
-   Same as [unescaped] but instead of raising [Failure _] returns an error
-   message with the position in the string in case of failure.
-*)
-val unescaped_res : ?strict:bool -> string -> (string, int * string) Result.t
+val unescaped_exn : ?strict:bool -> string -> string
 
 
 (** [squeeze str] reduces all sequences of spaces, newlines, tabs, and carriage
@@ -53,8 +47,8 @@ val pad_left : ?char:char -> string -> int -> string
 
 val pad_right : ?char:char -> string -> int -> string
 
-(**deprecated in favour of word_wrap *)
 val line_break : len:int -> string -> string list
+[@@deprecated "[since 2021-08] Use [word_wrap] instead."]
 
 (**
    [word_wrap ~soft_limit s]
@@ -77,6 +71,3 @@ val word_wrap
     [transpose] argument, it also considers transpositions (Damerau-Levenshtein
     distance). *)
 val edit_distance : ?transpose:unit -> string -> string -> int
-
-(** [not_empty_opt string] returns [None] if the string is empty, [Some string] otherwise. *)
-val not_empty_opt : string -> string option

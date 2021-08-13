@@ -194,20 +194,15 @@ let unescaped' ?(strict = true) s =
   loop ()
 ;;
 
-let unescaped ?strict s =
+let unescaped_exn ?strict s =
   try unescaped' ?strict s with
   | Unescape_error (_, pos, message) ->
     invalid_argf
-      "String_extended.unescaped error at position %d of %s: %s"
+      "String_extended.unescaped_exn error at position %d of %s: %s"
       pos
       s
       message
       ()
-;;
-
-let unescaped_res ?strict s =
-  try Result.Ok (unescaped' ?strict s) with
-  | Unescape_error (_, pos, message) -> Result.Error (pos, message)
 ;;
 
 let squeeze str =
@@ -454,8 +449,3 @@ let%test _ = edit_distance ~transpose:() "sitting" "kitten" = 3
 let%test _ = edit_distance "abcdef" "1234567890" = 10
 let%test _ = edit_distance "foobar" "fubahr" = 3
 let%test _ = edit_distance "hylomorphism" "zylomorphism" = 1
-
-let not_empty_opt = function
-  | "" -> None
-  | s -> Some s
-;;
