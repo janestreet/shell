@@ -75,36 +75,6 @@ let collate s1 s2 =
   loop ()
 ;;
 
-let%test_module "collate" =
-  (module struct
-    let ( <! ) s s' = collate s s' < 0
-
-    (*
-       let (>!) s s' = collate s s' > 0
-
-       let basic_tests = (fun (s,s') ->
-       "invertible" @? ((s' <! s) = (s >! s'));
-       "total" @? (definitive_clause [s<!s'; s=s'; s>!s']))
-    *)
-
-    (* repeat 50 basic_tests (pg sg sg);
-       repeat 2 basic_tests (dup sg);
-       repeat 50 (fun (s,s',s'') ->
-       let (s1,s2,s3) =
-       match List.sort ~compare:String_extended.collate [s;s';s''] with
-       | [s1;s2;s3] -> s1,s2,s3
-       | _ -> assert false
-       in
-       "transitive" @?
-       (((s1 <! s2) || (s2 <! s3)) = (s1 <! s3)))
-       (tg sg sg sg); *)
-
-    let%test _ = "a2b" <! "a10b"
-    let%test _ = "a2b" <! "a02b"
-    let%test _ = "a010b" <! "a20b"
-  end)
-;;
-
 (**
    Inverse operation of [String.escaped]
 *)
@@ -381,25 +351,6 @@ let is_substring_deprecated ~substring:needle haystack =
   else Core.String.is_substring ~substring:needle haystack
 ;;
 
-let%test _ = is_substring_deprecated ~substring:"foo" "foo"
-let%test _ = not (is_substring_deprecated ~substring:"" "")
-
-let%test _ =
-  (* For bug compatibility with the ML version that used to be here *)
-  try
-    ignore (is_substring_deprecated ~substring:"" "foo");
-    assert false (* should not be reachable *)
-  with
-  | Invalid_argument _ -> true
-;;
-
-let%test _ = not (is_substring_deprecated ~substring:"foo" "")
-let%test _ = is_substring_deprecated ~substring:"bar" "foobarbaz"
-let%test _ = not (is_substring_deprecated ~substring:"Z" "z")
-let%test _ = not (is_substring_deprecated ~substring:"store" "video stapler")
-let%test _ = not (is_substring_deprecated ~substring:"sandwich" "apple")
-let%test _ = is_substring_deprecated ~substring:"z" "abc\x00z"
-
 let edit_distance_matrix ?transpose s1 s2 =
   let transpose = Option.is_some transpose in
   let l1, l2 = String.length s1, String.length s2 in
@@ -421,12 +372,11 @@ let edit_distance_matrix ?transpose s1 s2 =
             [ d.(x - 1).(y) + 1; d.(x).(y - 1) + 1; d.(x - 1).(y - 1) + 1 ]
       in
       let min_d =
-        if
-          transpose
-          && x > 1
-          && y > 1
-          && s1.[x - 1] = s2.[y - 2]
-          && s1.[x - 2] = s2.[y - 1]
+        if transpose
+        && x > 1
+        && y > 1
+        && s1.[x - 1] = s2.[y - 2]
+        && s1.[x - 2] = s2.[y - 1]
         then min min_d (d.(x - 2).(y - 2) + 1)
         else min_d
       in
@@ -439,13 +389,3 @@ let edit_distance_matrix ?transpose s1 s2 =
 let edit_distance ?transpose s1 s2 =
   (edit_distance_matrix ?transpose s1 s2).(String.length s1).(String.length s2)
 ;;
-
-let%test _ = edit_distance "" "" = 0
-let%test _ = edit_distance "stringStringString" "stringStringString" = 0
-let%test _ = edit_distance "ocaml" "coaml" = 2
-let%test _ = edit_distance ~transpose:() "ocaml" "coaml" = 1
-let%test _ = edit_distance "sitting" "kitten" = 3
-let%test _ = edit_distance ~transpose:() "sitting" "kitten" = 3
-let%test _ = edit_distance "abcdef" "1234567890" = 10
-let%test _ = edit_distance "foobar" "fubahr" = 3
-let%test _ = edit_distance "hylomorphism" "zylomorphism" = 1

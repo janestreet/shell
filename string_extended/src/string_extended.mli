@@ -2,7 +2,7 @@
 
 open! Core
 
-(** [collate s1 s2] sorts string in an order that's usaully more suited for human
+(** [collate s1 s2] sorts string in an order that's usually more suited for human
     consumption by treating ints specially, e.g. it will output:
     [["rfc1.txt";"rfc822.txt";"rfc2086.txt"]].
 
@@ -16,6 +16,7 @@ open! Core
     It is a total order. *)
 val collate : string -> string -> int
 
+
 (**
    [unescaped_exn s] is the inverse operation of [escaped]: it takes a string where
    all the special characters are escaped following the lexical convention of
@@ -27,6 +28,9 @@ val collate : string -> string -> int
    raise errors. This mimics the behaviour of the ocaml lexer.
 *)
 val unescaped_exn : ?strict:bool -> string -> string
+[@@deprecated
+  "[since 2021-08] Consider using [Scanf.unescaped] instead.  Be aware it behaves \
+   differently on inputs containing double-quote characters."]
 
 
 (** [squeeze str] reduces all sequences of spaces, newlines, tabs, and carriage
