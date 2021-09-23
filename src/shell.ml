@@ -450,12 +450,12 @@ let which = Shell_internal.which
 let ln ?s ?f src dst =
   let s = Option.map s ~f:(fun () -> "-s") in
   let f = Option.map f ~f:(fun () -> "-f") in
-  run "/bin/ln" (List.filter_map ~f:ident [s; f] @ ["-n"; "--"; src; dst])
+  run "/bin/ln" (List.filter_map ~f:Fn.id [s; f] @ ["-n"; "--"; src; dst])
 
 let rm ?r ?f path =
   let r = Option.map r ~f:(fun () -> "-r") in
   let f = Option.map f ~f:(fun () -> "-f") in
-  run "/bin/rm" (List.filter_map ~f:ident [r; f; Some "--"; Some path])
+  run "/bin/rm" (List.filter_map ~f:Fn.id [r; f; Some "--"; Some path])
 
 let mv src dst =
   run "/bin/mv" ["--";src;dst]
@@ -463,7 +463,7 @@ let mv src dst =
 let mkdir ?p ?perm path =
   let p = Option.map p ~f:(fun () -> "-p") in
   let mode = Option.map perm ~f:(sprintf "--mode=%o") in
-  run "/bin/mkdir" (List.filter_map ~f:ident [p; mode;Some "--";Some path])
+  run "/bin/mkdir" (List.filter_map ~f:Fn.id [p; mode;Some "--";Some path])
 
 (* TODO: Deal with atomicity  *)
 let cp ?(overwrite=true) ?perm src dst =

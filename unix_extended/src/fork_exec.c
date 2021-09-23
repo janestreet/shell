@@ -281,6 +281,7 @@ CAMLprim value extended_ml_spawn
     }else {
       SYSCALL(execv(prog,(char **) args));
     };
+    /* FALLTHRU */
 
   default: /* Parent process */
 
