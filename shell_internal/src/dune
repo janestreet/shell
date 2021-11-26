@@ -1,3 +1,2 @@
 (library (name shell_internal) (public_name shell.shell_internal)
- (libraries core_kernel.core core.core_unix core.sys_unix)
- (preprocess (pps ppx_jane)))
+ (libraries core core_unix core_unix.sys_unix) (preprocess (pps ppx_jane)))

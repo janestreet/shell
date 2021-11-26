@@ -12,12 +12,12 @@ build: [
 depends: [
   "ocaml" {>= "4.08.0"}
   "core"
-  "core_kernel"
+  "core_unix"
   "jst-config"
   "ppx_jane"
   "textutils"
-  "dune"        {>= "2.0.0"}
-  "spawn"       {>= "v0.12"}
+  "dune"       {>= "2.0.0"}
+  "spawn"      {>= "v0.12"}
 ]
 synopsis: "Yet another implementation of fork&exec and related functionality"
 description: "
