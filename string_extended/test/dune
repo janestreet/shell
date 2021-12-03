@@ -1,3 +1,3 @@
 (library (name string_extended_test)
- (libraries core_kernel.core expect_test_helpers_core string_extended)
+ (libraries core expect_test_helpers_core string_extended)
  (preprocess (pps ppx_jane)))
