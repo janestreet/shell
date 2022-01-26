@@ -30,7 +30,6 @@ module Unix := Core_unix
    - [strict_errors]  : pass '-eu -o pipefail' options to bash when running the
      command
 
-
    WARNING: the input argument to this function should not be used because
    it can deadlock if the input is too big (~160kb?)
 *)
