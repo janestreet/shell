@@ -1,7 +1,7 @@
 open Core
 open Poly
 module Unix = Core_unix
-module Time = Time_unix
+module Time = Time_float_unix
 module Sys = Caml.Sys
 
 let rec temp_failure_retry f =

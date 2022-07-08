@@ -8,7 +8,7 @@
 open! Core
 
 module Status : sig
-  type t =   [ `Timeout of Time.Span.t
+  type t =   [ `Timeout of Time_float.Span.t
              | `Exited of int
              | `Signaled of Signal.t
                (* WStopped is impossible*)
@@ -39,7 +39,7 @@ end
 *)
 val kill :
   ?is_child:bool ->
-  ?wait_for:Time.Span.t ->
+  ?wait_for:Time_float.Span.t ->
   ?signal:Signal.t ->
   Pid.t
   -> unit
@@ -50,7 +50,7 @@ val kill :
    [stdoutf s len] and [stderrf s len] should only inspect the [String.subo s ~len]
    component of [s]. *)
 val run :
-  ?timeout:Time.Span.t
+  ?timeout:Time_float.Span.t
   -> ?use_extra_path:bool
   -> ?working_dir:string
   -> ?setuid:int

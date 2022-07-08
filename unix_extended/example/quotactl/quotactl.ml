@@ -1,7 +1,7 @@
 open Core
 open Poly
 module Unix = Core_unix
-module Time = Time_unix
+module Time = Time_float_unix
 module Quota = Unix_extended.Quota
 
 let id_kind_and_lookup = function

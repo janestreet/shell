@@ -35,7 +35,7 @@ module Unix := Core_unix
 *)
 type 'a with_process_flags =
   ?use_extra_path:bool
-  -> ?timeout:Time.Span.t option
+  -> ?timeout:Time_float.Span.t option
   -> ?working_dir:string (* rename to run_in? *)
   -> ?setuid:int
   -> ?setgid:int
@@ -148,7 +148,9 @@ val run_fold  :
 
 type ('a,'ret) sh_cmd = ('a, unit, string,'ret) format4 -> 'a
 
-type 'a with_sh_flags = ?strict_errors:bool -> 'a
+
+type 'a with_sh_flags =
+  ?strict_errors:bool -> 'a
 
 val sh       : ('a,unit)          sh_cmd with_run_flags with_sh_flags
 val sh_lines : ('a,string list)   sh_cmd with_run_flags with_sh_flags
@@ -225,7 +227,7 @@ val extra_path : string list ref
 (** Process dispatching *)
 module Process : sig
 
-  type status =  [ `Timeout of Time.Span.t
+  type status =  [ `Timeout of Time_float.Span.t
                  | `Exited of int
                  | `Signaled of Signal.t
                    (* WStopped is impossible*)
@@ -249,7 +251,7 @@ module Process : sig
   val status_to_string : status -> string
 
   val set_defaults
-    :  ?timeout:Time.Span.t option
+    :  ?timeout:Time_float.Span.t option
     -> ?verbose:bool
     -> ?echo:bool
     -> ?preserve_euid:bool

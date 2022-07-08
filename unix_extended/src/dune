@@ -1,5 +1,5 @@
 (library (name unix_extended) (public_name shell.unix_extended)
- (libraries core shell_internal spawn core_unix.time_unix)
+ (libraries core shell_internal spawn core_unix.time_float_unix)
  (preprocessor_deps config.h) (c_names fork_exec unix_extended_stubs)
  (preprocess (pps ppx_jane)))
 

@@ -12,7 +12,7 @@ module Process = struct
 
   exception Early_exit [@@deriving sexp]
 
-  type status = [ `Timeout of Time.Span.t | Low_level_process.Status.t ] [@@deriving sexp_of]
+  type status = [ `Timeout of Time_float.Span.t | Low_level_process.Status.t ] [@@deriving sexp_of]
   (*  type status = (unit, error) Result.t with sexp_of *)
 
   type t = {
@@ -40,7 +40,7 @@ module Process = struct
     String.concat ~sep:" " (List.map ~f (prog::args))
 
   let status_to_string = function
-    | `Timeout t -> sprintf !"Timed out (ran for %{Time.Span})" t
+    | `Timeout t -> sprintf !"Timed out (ran for %{Time_float.Span})" t
     | #Low_level_process.Status.t as s -> Low_level_process.Status.to_string s
 
   let format_failed c =
@@ -331,7 +331,7 @@ let%test_unit _ =
 
 type 'a with_process_flags =
   ?use_extra_path:bool
-  -> ?timeout:Time.Span.t option
+  -> ?timeout:Time_float.Span.t option
   -> ?working_dir:string (* rename to run_in? *)
   -> ?setuid:int
   -> ?setgid:int

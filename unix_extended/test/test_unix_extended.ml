@@ -127,3 +127,15 @@ let%expect_test "[Mount_entry.visible_filesystem]" =
        (options   rw))))
 |}]
 ;;
+
+let%expect_test "[terminal_width]" =
+  let width = Lazy.force terminal_width in
+  let height = Lazy.force terminal_height in
+  (* we just assert that we got some positive/non-zero width and height. *)
+  print_s ([%sexp_of: bool] (width > 0));
+  print_s ([%sexp_of: bool] (height > 0));
+  [%expect {|
+    true
+    true
+    |}]
+;;

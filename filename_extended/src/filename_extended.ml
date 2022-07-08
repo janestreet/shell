@@ -160,7 +160,7 @@ let create_extension_map l =
 
 let extension_cmp map h1 h2 =
   let lookup e =
-    Option.value (Map.find map e) ~default:(e,0)
+    Option.value (Core.Map.find map e) ~default:(e,0)
   in
   Tuple2.compare (lookup h1) (lookup h2)
     ~cmp1:(String_extended.collate)

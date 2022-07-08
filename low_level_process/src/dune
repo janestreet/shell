@@ -1,4 +1,4 @@
 (library (name low_level_process) (public_name shell.low_level_process)
- (libraries core core_unix.linux_ext shell_internal core_unix.time_unix
-  unix_extended)
+ (libraries core core_unix.linux_ext shell_internal unix_extended
+  core_unix.time_float_unix)
  (preprocess (pps ppx_jane)))

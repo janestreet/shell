@@ -148,7 +148,7 @@ module Quota : sig
   type 'units limit =
     { soft : 'units option
     ; hard : 'units option
-    ; grace : Time.t option
+    ; grace : Time_float.t option
     }
   [@@deriving sexp]
 
@@ -184,3 +184,4 @@ module Mount_entry : sig
 end
 
 val terminal_width : int Lazy.t
+val terminal_height : int Lazy.t

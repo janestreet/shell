@@ -52,7 +52,7 @@ open Core
 open Poly
 module Unix = Core_unix
 open Unix
-module Time = Time_unix
+module Time = Time_float_unix
 
 external raw_fork_exec
   :  stdin:File_descr.t
@@ -97,7 +97,7 @@ module Env = struct
   let get () =
     Array.fold (Unix.environment ()) ~init:empty ~f:(fun env str ->
       match String.lsplit2 ~on:'=' str with
-      | Some (key, data) -> set ~key ~data env
+      | Some (key, data) -> Map.set ~key ~data env
       | None ->
         failwithf "extended_unix.Env.get %S is not in the form of key=value" str ())
   ;;
@@ -125,11 +125,13 @@ module Env = struct
         data
         key
         ()
-    else String.Map.set ~key ~data env
+    else Map.set ~key ~data (env : _ String.Map.t)
   ;;
 
   let to_string_array env =
-    String.Map.to_alist env |> List.map ~f:(fun (k, v) -> k ^ "=" ^ v) |> List.to_array
+    Map.to_alist (env : _ String.Map.t)
+    |> List.map ~f:(fun (k, v) -> k ^ "=" ^ v)
+    |> List.to_array
   ;;
 end
 
@@ -420,7 +422,9 @@ module Mount_entry = struct
     | [] -> Ok None
     | fsname
       :: directory
-      :: fstype :: options :: (([] | [ _ ] | [ _; _ ]) as dump_freq_and_fsck_pass) ->
+      :: fstype
+      :: options
+      :: (([] | [ _ ] | [ _; _ ]) as dump_freq_and_fsck_pass) ->
       let dump_freq, fsck_pass =
         match dump_freq_and_fsck_pass with
         | [] -> None, None
@@ -442,35 +446,37 @@ module Mount_entry = struct
     let overlay map t =
       let remove_prefix = add_slash_if_needed (directory t) in
       let rec loop map =
-        match String.Map.closest_key map `Greater_than remove_prefix with
+        match Map.closest_key (map : _ String.Map.t) `Greater_than remove_prefix with
         | None -> map
         | Some (key, _) ->
           if not (String.is_prefix ~prefix:remove_prefix key)
           then map
-          else loop (String.Map.remove map key)
+          else loop (Map.remove (map : _ String.Map.t) key)
       in
-      String.Map.set (loop map) ~key:(directory t) ~data:t
+      Map.set (loop map : _ String.Map.t) ~key:(directory t) ~data:t
     in
     List.fold ts ~init:String.Map.empty ~f:(fun map t ->
       if not (String.is_prefix ~prefix:"/" (directory t)) then map else overlay map t)
   ;;
 end
 
-let terminal_width =
-  lazy
-    (* When both stdout and stderr are not terminals, tput outputs 80 rather than the
-       number of columns, so we can't use [Process.run].  Instead, we use
-       [open_process_in] so that stderr is still the terminal.  But, we don't want
-       tput's error messages to be sent to stderr and seen by the user, so we first
-       run tput with no output to see if it succeeds, and only then do we run it with
-       stderr not redirected. *)
-    (try
-       Exn.protectx
-         (Core_unix.open_process_in
-            "/usr/bin/tput cols &> /dev/null && /usr/bin/tput cols")
-         ~f:(fun in_channel ->
-           In_channel.input_line in_channel |> Option.value_exn |> Int.of_string)
-         ~finally:In_channel.close
-     with
-     | _ -> 90)
+let tput_property ~default prop =
+  (* When both stdout and stderr are not terminals, tput outputs 80 (cols) or
+     24 (lines) rather than the actual size, so we can't use [Process.run].
+     Instead, we use [open_process_in] so that stderr is still the terminal.
+     But, we don't want tput's error messages to be sent to stderr and seen by
+     the user, so we first run tput with no output to see if it succeeds, and
+     only then do we run it with stderr not redirected. *)
+  try
+    Exn.protectx
+      (Core_unix.open_process_in
+         (Core.sprintf "/usr/bin/tput %s &> /dev/null && /usr/bin/tput %s" prop prop))
+      ~f:(fun in_channel ->
+        In_channel.input_line in_channel |> Option.value_exn |> Int.of_string)
+      ~finally:In_channel.close
+  with
+  | _ -> default
 ;;
+
+let terminal_width = lazy (tput_property ~default:90 "cols")
+let terminal_height = lazy (tput_property ~default:24 "lines")
