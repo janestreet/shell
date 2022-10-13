@@ -341,16 +341,6 @@ let word_wrap
     Bytes.unsafe_to_string ~no_mutation_while_string_reachable:res
 ;;
 
-let is_substring_deprecated ~substring:needle haystack =
-  (* 2014-10-29 mbac: a recent release of Core introduced a fast and less surprising
-     version of KMP.  Everyone should use that.  This function is simply here to maintain
-     bug compatibiltiy with the original pure-ML version of f is_substring that used
-     to be here. *)
-  if String.length needle = 0
-  then if String.length haystack = 0 then false else invalid_arg "index out of bounds"
-  else Core.String.is_substring ~substring:needle haystack
-;;
-
 let edit_distance_matrix ?transpose s1 s2 =
   let transpose = Option.is_some transpose in
   let l1, l2 = String.length s1, String.length s2 in

@@ -42,30 +42,6 @@ let%test_module "collate" =
   end)
 ;;
 
-let%test_module "is_substring_deprecated" =
-  (module struct
-    let is_substring_deprecated =
-      (String_extended.is_substring_deprecated [@alert "-deprecated"])
-    ;;
-
-    let%test _ = is_substring_deprecated ~substring:"foo" "foo"
-    let%test _ = not (is_substring_deprecated ~substring:"" "")
-
-    let%expect_test _ =
-      (* For bug compatibility with the ML version that used to be here *)
-      require_does_raise [%here] (fun () -> is_substring_deprecated ~substring:"" "foo");
-      [%expect {| (Invalid_argument "index out of bounds") |}]
-    ;;
-
-    let%test _ = not (is_substring_deprecated ~substring:"foo" "")
-    let%test _ = is_substring_deprecated ~substring:"bar" "foobarbaz"
-    let%test _ = not (is_substring_deprecated ~substring:"Z" "z")
-    let%test _ = not (is_substring_deprecated ~substring:"store" "video stapler")
-    let%test _ = not (is_substring_deprecated ~substring:"sandwich" "apple")
-    let%test _ = is_substring_deprecated ~substring:"z" "abc\x00z"
-  end)
-;;
-
 let%test_module "edit_distance" =
   (module struct
     let edit_distance = String_extended.edit_distance

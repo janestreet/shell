@@ -38,10 +38,6 @@ val unescaped_exn : ?strict:bool -> string -> string
 *)
 val squeeze : string -> string
 
-val is_substring_deprecated : substring:string -> string -> bool
-[@@deprecated
-  "[since 2021-06] (but really: since 2014) Use Core.String.is_substring instead."]
-
 
 (** [pad_left ~char s len]
     Returns [s] padded to the length [len] by adding characters [char] to the
