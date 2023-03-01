@@ -1,5 +1,4 @@
 open Core
-open Poly
 
 (* Natural ordering like found in gnome nautilus, the mac finder etc...
    Refer to Mli for more documentation
@@ -25,14 +24,14 @@ let collate s1 s2 =
       | Some _, None -> 1
       | None, Some _ -> -1
       | None, None -> 0
-      | Some c1, Some c2 when c1 = c2 -> loop ()
+      | Some c1, Some c2 when Char.equal c1 c2 -> loop ()
       | Some c1, Some c2 -> Char.compare c1 c2
     in
     loop ()
   in
   let compare_numerical () =
     let rec consume0 s pos =
-      match next ~ok:(( = ) '0') s pos with
+      match next ~ok:(Char.equal '0') s pos with
       | Some _ -> consume0 s pos
       | None -> ()
     in
@@ -109,7 +108,7 @@ let unescaped' ?(strict = true) s =
     if !pos < len
     then (
       let c = consume () in
-      if c <> '\\'
+      if Char.( <> ) c '\\'
       then emit c
       else (
         let mark = !pos in
@@ -132,6 +131,7 @@ let unescaped' ?(strict = true) s =
             consume_blank ()
           | 'x' ->
             let c2hex c =
+              let open Char.O in
               if c >= 'A' && c <= 'F'
               then Char.to_int c + 10 - Char.to_int 'A'
               else if c >= 'a' && c <= 'f'
@@ -183,7 +183,7 @@ let squeeze str =
     then Buffer.contents buf
     else (
       let c = str.[i] in
-      if c = ' ' || c = '\n' || c = '\t' || c = '\r'
+      if Char.O.(c = ' ' || c = '\n' || c = '\t' || c = '\r')
       then skip_spaces (i + 1)
       else (
         Buffer.add_char buf c;
@@ -193,7 +193,7 @@ let squeeze str =
     then Buffer.contents buf
     else (
       let c = str.[i] in
-      if c = ' ' || c = '\n' || c = '\t' || c = '\r'
+      if Char.O.(c = ' ' || c = '\n' || c = '\t' || c = '\r')
       then (
         Buffer.add_char buf ' ';
         skip_spaces (i + 1))
@@ -202,28 +202,6 @@ let squeeze str =
         copy_chars (i + 1)))
   in
   copy_chars 0
-;;
-
-let pad_right ?(char = ' ') s l =
-  let src_len = String.length s in
-  if src_len >= l
-  then s
-  else (
-    let res = Bytes.create l in
-    Bytes.From_string.blit ~src:s ~dst:res ~src_pos:0 ~dst_pos:0 ~len:src_len;
-    Bytes.fill ~pos:src_len ~len:(l - src_len) res char;
-    Bytes.unsafe_to_string ~no_mutation_while_string_reachable:res)
-;;
-
-let pad_left ?(char = ' ') s l =
-  let src_len = String.length s in
-  if src_len >= l
-  then s
-  else (
-    let res = Bytes.create l in
-    Bytes.From_string.blit ~src:s ~dst:res ~src_pos:0 ~dst_pos:(l - src_len) ~len:src_len;
-    Bytes.fill ~pos:0 ~len:(l - src_len) res char;
-    Bytes.unsafe_to_string ~no_mutation_while_string_reachable:res)
 ;;
 
 let line_break ~len s =
@@ -238,7 +216,7 @@ let line_break ~len s =
       let acc =
         if Buffer.length buf <> 0
         then flush_buf () :: acc
-        else if acc = []
+        else if List.is_empty acc
         then [ "" ]
         else acc
       in
@@ -267,7 +245,7 @@ let rec word_wrap__break_one ~hard_limit ~soft_limit ~previous_match s ~pos ~len
   else (
     match s.[pos] with
     (* Detect \r\n as one newline and not two... *)
-    | '\r' when pos < String.length s - 1 && s.[pos + 1] = '\n' -> len, pos + 2
+    | '\r' when pos < String.length s - 1 && Char.equal s.[pos + 1] '\n' -> len, pos + 2
     | '\r' | '\n' -> len, pos + 1
     | ' ' | '\t' ->
       word_wrap__break_one
@@ -354,7 +332,7 @@ let edit_distance_matrix ?transpose s1 s2 =
   for y = 1 to l2 do
     for x = 1 to l1 do
       let min_d =
-        if s1.[x - 1] = s2.[y - 1]
+        if Char.equal s1.[x - 1] s2.[y - 1]
         then d.(x - 1).(y - 1)
         else
           List.reduce_exn
@@ -365,8 +343,8 @@ let edit_distance_matrix ?transpose s1 s2 =
         if transpose
         && x > 1
         && y > 1
-        && s1.[x - 1] = s2.[y - 2]
-        && s1.[x - 2] = s2.[y - 1]
+        && Char.equal s1.[x - 1] s2.[y - 2]
+        && Char.equal s1.[x - 2] s2.[y - 1]
         then min min_d (d.(x - 2).(y - 2) + 1)
         else min_d
       in

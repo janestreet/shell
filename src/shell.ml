@@ -51,7 +51,7 @@ module Process = struct
                             "stderr:";
                             c.stderr]
 
-  let () = Caml.Printexc.register_printer (function
+  let () = Stdlib.Printexc.register_printer (function
     | Failed r -> Some (format_failed r)
     | _ -> None)
 

@@ -38,15 +38,6 @@ val unescaped_exn : ?strict:bool -> string -> string
 *)
 val squeeze : string -> string
 
-
-(** [pad_left ~char s len]
-    Returns [s] padded to the length [len] by adding characters [char] to the
-    left of the string. If s is already longer than [len] it is returned unchanged.
-*)
-val pad_left : ?char:char -> string -> int -> string
-
-val pad_right : ?char:char -> string -> int -> string
-
 val line_break : len:int -> string -> string list
 [@@deprecated "[since 2021-08] Use [word_wrap] instead."]
 

@@ -322,6 +322,14 @@ val cp :
 
 val ln : ?s:unit -> ?f:unit -> string -> string -> unit
 
+(** Behavior of flags for [rm] function differs slightly from what you may expect:
+
+    - When called on a read-only file, [rm file] will remove that file, even if [~f:()]
+      flag is not passed, which is not the case for an interactive usage of a shell "rm"
+      command;
+    - When called on a non-existent file, [rm file] would raise, while [rm ~f:() file]
+      would succeed.
+*)
 val rm : ?r:unit -> ?f:unit -> string -> unit
 
 val mv : string -> string -> unit
