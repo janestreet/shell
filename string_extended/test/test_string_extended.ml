@@ -5,7 +5,6 @@ let%test_module "collate" =
   (module struct
     let collate = String_extended.collate
     let ( <! ) s s' = collate s s' < 0
-
     let%test _ = "a2b" <! "a10b"
     let%test _ = "a2b" <! "a02b"
     let%test _ = "a010b" <! "a20b"
@@ -45,7 +44,6 @@ let%test_module "collate" =
 let%test_module "edit_distance" =
   (module struct
     let edit_distance = String_extended.edit_distance
-
     let%test _ = edit_distance "" "" = 0
     let%test _ = edit_distance "stringStringString" "stringStringString" = 0
     let%test _ = edit_distance "ocaml" "coaml" = 2
