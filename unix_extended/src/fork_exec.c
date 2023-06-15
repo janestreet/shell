@@ -65,7 +65,7 @@ static void report_errno_on_pipe (int fd,int my_err) __attribute__((noreturn));
 
 /*
   Write an int to an fd.
-  This function is designed to be used on the fork side and therefor only uses
+  This function is designed to be used on the fork side and therefore only uses
   async-signal-safe functions.
 */
 static void report_errno_on_pipe (int fd, int my_err) {
