@@ -382,7 +382,7 @@ module Mount_entry = struct
     ; dump_freq : int option [@sexp.option]
     ; fsck_pass : int option [@sexp.option]
     }
-  [@@deriving sexp, fields]
+  [@@deriving sexp, fields ~getters]
 
   let escape_seqs = [ "040", " "; "011", "\t"; "012", "\n"; "134", "\\"; "\\", "\\" ]
 
