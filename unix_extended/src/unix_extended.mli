@@ -105,7 +105,7 @@ module Extended_passwd : sig
 end
 
 val strptime : ?allow_trailing_input:bool -> fmt:string -> string -> Unix.tm
-[@@deprecated "[since 2019-07] use Core_unix.strptime"]
+  [@@deprecated "[since 2019-07] use Core_unix.strptime"]
 
 (** The CIDR module moved into Core_unix *)
 
@@ -126,8 +126,8 @@ module Inet_port : sig
   module Stable : sig
     module V1 :
       Stable_comparable.V1
-      with type t = t
-       and type comparator_witness = comparator_witness
+        with type t = t
+         and type comparator_witness = comparator_witness
   end
 end
 

@@ -29,8 +29,10 @@ val explode : string -> string list
 val implode : string list -> string
 
 (**/**)
+
 (* this is exported because it is used by core_extended.filename. *)
 val normalize_path : string list -> string list
+
 (**/**)
 
 (** Filename.compare is a comparison that normalizes filenames ("./a" = "a"), uses a more
@@ -38,20 +40,21 @@ val normalize_path : string list -> string list
     extenstions ("a.c" > "a.h").
 
     It is a total comparison on normalized filenames. *)
-val compare: string -> string -> int
+val compare : string -> string -> int
 
 (** [with_open_temp_file ~write ~f prefix suffix] create a temporary file; runs [write] on
     its [out_channel] and then [f] on the resulting file. The file is removed once [f] is
     done running. *)
-val with_open_temp_file:
-  ?in_dir: string
+val with_open_temp_file
+  :  ?in_dir:string
   -> ?write:(out_channel -> unit)
-  -> f: (string -> 'a)
-  -> string -> string
+  -> f:(string -> 'a)
+  -> string
+  -> string
   -> 'a
 
 (** Runs [f] with a temporary dir as option and removes the directory afterwards. *)
-val with_temp_dir: ?in_dir:string -> string -> string -> f:(string -> 'a) -> 'a
+val with_temp_dir : ?in_dir:string -> string -> string -> f:(string -> 'a) -> 'a
 
 (** [is_parent dir1 dir2] returns [true] if [dir1] is a parent of [dir2]
 

@@ -136,16 +136,16 @@ module Env = struct
 end
 
 let fork_exec
-      ?(stdin = Unix.stdin)
-      ?(stdout = Unix.stdout)
-      ?(stderr = Unix.stderr)
-      ?(path_lookup = true)
-      ?env
-      ?working_dir
-      ?setuid
-      ?setgid
-      prog
-      args
+  ?(stdin = Unix.stdin)
+  ?(stdout = Unix.stdout)
+  ?(stderr = Unix.stderr)
+  ?(path_lookup = true)
+  ?env
+  ?working_dir
+  ?setuid
+  ?setgid
+  prog
+  args
   =
   let env =
     Option.map env ~f:(fun e ->

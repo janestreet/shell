@@ -20,11 +20,11 @@ let%expect_test "[Mount_entry.parse_line]" =
     ; "\\"
     ]
     ~f:(fun input ->
-      print_s
-        [%message
-          ""
-            (input : string)
-            ~output:(Mount_entry.parse_line input : Mount_entry.t option Or_error.t)]);
+    print_s
+      [%message
+        ""
+          (input : string)
+          ~output:(Mount_entry.parse_line input : Mount_entry.t option Or_error.t)]);
   [%expect
     {|
     ((input "/dev/mapper/vg01-root / ext4 defaults 0 0")

@@ -5,6 +5,7 @@
     strictly.
 *)
 open! Core
+
 module Unix := Core_unix
 
 (** {6 Process handling }  *)
@@ -39,8 +40,7 @@ type 'a with_process_flags =
   -> ?working_dir:string (* rename to run_in? *)
   -> ?setuid:int
   -> ?setgid:int
-  -> ?env:[`Extend of (string * string) list
-          |`Replace of (string * string) list]
+  -> ?env:[ `Extend of (string * string) list | `Replace of (string * string) list ]
   -> ?verbose:bool
   -> ?echo:bool
   -> ?input:string
@@ -77,7 +77,7 @@ type 'a with_run_flags = ?expect:int list -> 'a with_process_flags
 type 'a cmd = string -> string list -> 'a
 
 (** Runs a command and discards its output. *)
-val run       : unit cmd with_run_flags
+val run : unit cmd with_run_flags
 
 (** Runs a command and returns its output line separated. Note: most commands
     print a newline at the end of their output so the shell prompt appears on
@@ -96,40 +96,43 @@ val run_lines : ?eol:char -> string list cmd with_run_flags
     piping through [head -n 1] would. When that happens, exit code of the
     program gets ignored!
 *)
-val run_first_line     : ?eol:char -> string option cmd with_run_flags
+val run_first_line : ?eol:char -> string option cmd with_run_flags
+
 val run_first_line_exn : ?eol:char -> string cmd with_run_flags
 
 (** Returns the only line of the command's output.
     If the command prints zero or multiple lines this returns an [Error].
 
     If the command exits with non-zero exit code it raises an exception. *)
-val run_one_line     : ?eol:char -> string Or_error.t cmd with_run_flags
+val run_one_line : ?eol:char -> string Or_error.t cmd with_run_flags
+
 val run_one_line_exn : ?eol:char -> string cmd with_run_flags
+
 val run_one : ?eol:char -> string option cmd with_run_flags
-[@@deprecated "[since 2017-11] Use [run_one_line] to get a different behavior or \
-               [run_first_line] to get the old behavior"]
+  [@@deprecated
+    "[since 2017-11] Use [run_one_line] to get a different behavior or [run_first_line] \
+     to get the old behavior"]
+
 val run_one_exn : ?eol:char -> string cmd with_run_flags
-[@@deprecated "[since 2017-11] Use [run_one_line_exn] to get a different behavior or \
-               [run_first_line_exn] to get the old behavior"]
-
-
+  [@@deprecated
+    "[since 2017-11] Use [run_one_line_exn] to get a different behavior or \
+     [run_first_line_exn] to get the old behavior"]
 
 (** Return the full command's output in one string. See the note in
     [run_lines].
 *)
-val run_full  : string cmd with_run_flags
+val run_full : string cmd with_run_flags
 
 (** Fold over the lines in the stdout of a process;
     The `Continue/`Stop argument is there to allow early returning.
     [eol] specifies the end of line character used to separate the lines
     outputted by the the program
 *)
-val run_fold  :
-  ?eol:char
+val run_fold
+  :  ?eol:char
   -> init:'a
   -> f:('a -> string -> 'a * [ `Continue | `Stop ])
   -> 'a cmd with_run_flags
-
 
 (** {9 Dispatch to /bin/bash}
 
@@ -145,26 +148,27 @@ val run_fold  :
     issues and is much more straightforward to think about.
 *)
 
+type ('a, 'ret) sh_cmd = ('a, unit, string, 'ret) format4 -> 'a
+type 'a with_sh_flags = ?strict_errors:bool -> 'a
 
-type ('a,'ret) sh_cmd = ('a, unit, string,'ret) format4 -> 'a
+val sh : ('a, unit) sh_cmd with_run_flags with_sh_flags
+val sh_lines : ('a, string list) sh_cmd with_run_flags with_sh_flags
+val sh_full : ('a, string) sh_cmd with_run_flags with_sh_flags
 
+val sh_one : ('a, string option) sh_cmd with_run_flags with_sh_flags
+  [@@deprecated
+    "[since 2017-11] Use [sh_one_line] to get a different behavior or [sh_first_line] to \
+     get the old behavior"]
 
-type 'a with_sh_flags =
-  ?strict_errors:bool -> 'a
+val sh_one_exn : ('a, string) sh_cmd with_run_flags with_sh_flags
+  [@@deprecated
+    "[since 2017-11] Use [sh_one_line_exn] to get a different behavior or \
+     [sh_first_line_exn] to get the old behavior"]
 
-val sh       : ('a,unit)          sh_cmd with_run_flags with_sh_flags
-val sh_lines : ('a,string list)   sh_cmd with_run_flags with_sh_flags
-val sh_full  : ('a,string)        sh_cmd with_run_flags with_sh_flags
-val sh_one   : ('a,string option) sh_cmd with_run_flags with_sh_flags
-[@@deprecated "[since 2017-11] Use [sh_one_line] to get a different behavior or \
-               [sh_first_line] to get the old behavior"]
-val sh_one_exn : ('a,string) sh_cmd with_run_flags with_sh_flags
-[@@deprecated "[since 2017-11] Use [sh_one_line_exn] to get a different behavior or \
-               [sh_first_line_exn] to get the old behavior"]
-val sh_one_line       : ('a,string Or_error.t) sh_cmd with_run_flags with_sh_flags
-val sh_one_line_exn   : ('a,string)            sh_cmd with_run_flags with_sh_flags
-val sh_first_line     : ('a,string option)     sh_cmd with_run_flags with_sh_flags
-val sh_first_line_exn : ('a,string)            sh_cmd with_run_flags with_sh_flags
+val sh_one_line : ('a, string Or_error.t) sh_cmd with_run_flags with_sh_flags
+val sh_one_line_exn : ('a, string) sh_cmd with_run_flags with_sh_flags
+val sh_first_line : ('a, string option) sh_cmd with_run_flags with_sh_flags
+val sh_first_line_exn : ('a, string) sh_cmd with_run_flags with_sh_flags
 
 (* Magic invocation to avoid asking for password if we can.  These arguments are
    passed to ssh in the [ssh_*] functions below.  They're exposed in case you
@@ -174,19 +178,24 @@ val noninteractive_no_hostkey_checking_options : string list
 
 type 'a with_ssh_flags = ?ssh_options:string list -> ?user:string -> host:string -> 'a
 
-val ssh       : ('a,unit)          sh_cmd with_run_flags with_ssh_flags
-val ssh_lines : ('a,string list)   sh_cmd with_run_flags with_ssh_flags
-val ssh_full  : ('a,string)        sh_cmd with_run_flags with_ssh_flags
-val ssh_one   : ('a,string option) sh_cmd with_run_flags with_ssh_flags
-[@@deprecated "[since 2017-11] Use [ssh_one_line] to get a different behavior or \
-               [ssh_first_line] to get the old behavior"]
-val ssh_one_exn : ('a,string) sh_cmd with_run_flags with_ssh_flags
-[@@deprecated "[since 2017-11] Use [ssh_one_line_exn] to get a different behavior or \
-               [ssh_first_line_exn] to get the old behavior"]
-val ssh_one_line       : ('a,string Or_error.t) sh_cmd with_run_flags with_ssh_flags
-val ssh_one_line_exn   : ('a,string)            sh_cmd with_run_flags with_ssh_flags
-val ssh_first_line     : ('a,string option)     sh_cmd with_run_flags with_ssh_flags
-val ssh_first_line_exn : ('a,string)            sh_cmd with_run_flags with_ssh_flags
+val ssh : ('a, unit) sh_cmd with_run_flags with_ssh_flags
+val ssh_lines : ('a, string list) sh_cmd with_run_flags with_ssh_flags
+val ssh_full : ('a, string) sh_cmd with_run_flags with_ssh_flags
+
+val ssh_one : ('a, string option) sh_cmd with_run_flags with_ssh_flags
+  [@@deprecated
+    "[since 2017-11] Use [ssh_one_line] to get a different behavior or [ssh_first_line] \
+     to get the old behavior"]
+
+val ssh_one_exn : ('a, string) sh_cmd with_run_flags with_ssh_flags
+  [@@deprecated
+    "[since 2017-11] Use [ssh_one_line_exn] to get a different behavior or \
+     [ssh_first_line_exn] to get the old behavior"]
+
+val ssh_one_line : ('a, string Or_error.t) sh_cmd with_run_flags with_ssh_flags
+val ssh_one_line_exn : ('a, string) sh_cmd with_run_flags with_ssh_flags
+val ssh_first_line : ('a, string option) sh_cmd with_run_flags with_ssh_flags
+val ssh_first_line_exn : ('a, string) sh_cmd with_run_flags with_ssh_flags
 
 (** {9 Test dispatches}
 
@@ -209,14 +218,11 @@ val ssh_first_line_exn : ('a,string)            sh_cmd with_run_flags with_ssh_f
     - [true_v]: default value [[0]]
     - [false_v]: default_value [[1]]
 *)
-type 'a with_test_flags = ?true_v:int list -> ?false_v:int list
-  -> ('a with_process_flags)
+type 'a with_test_flags = ?true_v:int list -> ?false_v:int list -> 'a with_process_flags
 
-val test    : bool cmd with_test_flags
-
-val sh_test : ('a,bool) sh_cmd with_test_flags with_sh_flags
-
-val ssh_test : ('a,bool) sh_cmd with_test_flags with_ssh_flags
+val test : bool cmd with_test_flags
+val sh_test : ('a, bool) sh_cmd with_test_flags with_sh_flags
+val ssh_test : ('a, bool) sh_cmd with_test_flags with_ssh_flags
 
 (** variable used by dispatch command to find binaries not in the path.
     The default values contains only directory which should be in PATH and is
@@ -226,28 +232,27 @@ val extra_path : string list ref
 
 (** Process dispatching *)
 module Process : sig
-
-  type status =  [ `Timeout of Time_float.Span.t
-                 | `Exited of int
-                 | `Signaled of Signal.t
-                   (* WStopped is impossible*)
-                 ]
   (** The termination status of a process.
       This is an extension of [Unix.Process_status.t] to allow timeouts.
   *)
+  type status =
+    [ `Timeout of Time_float.Span.t
+    | `Exited of int
+    | `Signaled of Signal.t (* WStopped is impossible*)
+    ]
 
   type t
 
-  type result = {
-    command : t;
-    status  : status;
-    stdout  : string;
-    stderr  : string
-  }
+  type result =
+    { command : t
+    ; status : status
+    ; stdout : string
+    ; stderr : string
+    }
 
   exception Failed of result
 
-  val to_string        : t -> string
+  val to_string : t -> string
   val status_to_string : status -> string
 
   val set_defaults
@@ -260,20 +265,19 @@ module Process : sig
     -> unit
 
   val format_failed : result -> string
+  val cmd : string -> string list -> t
+  val shell : ?strict_errors:bool -> string -> t
 
-  val cmd    : string -> string list -> t
-  val shell  : ?strict_errors:bool -> string -> t
-
-  val make_ssh_command :
-    ?ssh_options:string list
+  val make_ssh_command
+    :  ?ssh_options:string list
     -> ?quote_args:bool
     -> ?user:string
     -> host:string
     -> string list
     -> t
 
-  val remote :
-    ?ssh_options:string list
+  val remote
+    :  ?ssh_options:string list
     -> ?quote_args:bool
     -> ?user:string
     -> host:string
@@ -285,41 +289,32 @@ module Process : sig
   val content : string reader
   val content_and_stderr : (string * string) reader
   val discard : unit reader
-
-  val lines   : ?eol:char -> unit -> string list reader
-  val head     : ?eol:char -> unit -> string option reader
+  val lines : ?eol:char -> unit -> string list reader
+  val head : ?eol:char -> unit -> string option reader
 
   exception Empty_head
 
   val head_exn : ?eol:char -> unit -> string reader
-
-  val one_line     : ?eol:char -> unit -> string Or_error.t reader
-  val one_line_exn     : ?eol:char -> unit -> string reader
-
+  val one_line : ?eol:char -> unit -> string Or_error.t reader
+  val one_line_exn : ?eol:char -> unit -> string reader
   val callback : add:(Bytes.t -> int -> unit) -> flush:(unit -> unit) -> unit reader
+
   val callback_with_stderr
-    : add:(Bytes.t -> int -> unit)
+    :  add:(Bytes.t -> int -> unit)
     -> add_err:(Bytes.t -> int -> unit)
-    -> flush:(unit -> unit) -> unit reader
+    -> flush:(unit -> unit)
+    -> unit reader
 
-  val run   :  (t -> 'a reader -> 'a)              with_run_flags
+  val run : (t -> 'a reader -> 'a) with_run_flags
   val run_k : ((t -> 'a reader -> 'a) -> 'b) -> 'b with_run_flags
-
-  val test   :  (t -> bool)              with_test_flags
+  val test : (t -> bool) with_test_flags
   val test_k : ((t -> bool) -> 'a) -> 'a with_test_flags
 end
 
 (** {6 Small helper commands} *)
 
 val mkdir : ?p:unit -> ?perm:int -> string -> unit
-
-val cp :
-  ?overwrite:bool
-  -> ?perm:Unix.file_perm
-  -> string
-  -> string
-  -> unit
-
+val cp : ?overwrite:bool -> ?perm:Unix.file_perm -> string -> string -> unit
 val ln : ?s:unit -> ?f:unit -> string -> string -> unit
 
 (** Behavior of flags for [rm] function differs slightly from what you may expect:
@@ -332,8 +327,8 @@ val ln : ?s:unit -> ?f:unit -> string -> string -> unit
 *)
 val rm : ?r:unit -> ?f:unit -> string -> unit
 
-val mv : string -> string -> unit
 (** Raises "Failed_command" *)
+val mv : string -> string -> unit
 
 (** Get the username. By default, the effective username. If real is true, get
     the real username. *)
@@ -342,4 +337,11 @@ val whoami : ?real:bool -> unit -> string
 val which : ?use_extra_path:bool -> string -> string option
 
 (** [scp user host from to] copy local file from to to *)
-val scp : ?compress:bool -> ?recurse:bool -> ?user:string -> host:string -> string -> string -> unit
+val scp
+  :  ?compress:bool
+  -> ?recurse:bool
+  -> ?user:string
+  -> host:string
+  -> string
+  -> string
+  -> unit

@@ -8,23 +8,22 @@
 open! Core
 
 module Status : sig
-  type t =   [ `Timeout of Time_float.Span.t
-             | `Exited of int
-             | `Signaled of Signal.t
-               (* WStopped is impossible*)
-             ]
+  type t =
+    [ `Timeout of Time_float.Span.t
+    | `Exited of int
+    | `Signaled of Signal.t (* WStopped is impossible*)
+    ]
   [@@deriving sexp_of]
 
   val to_string : t -> string
-
 end
 
 module Command_result : sig
-  type t= {
-    status      : Status.t;
-    stdout_tail : string;
-    stderr_tail : string
-  }
+  type t =
+    { status : Status.t
+    ; stdout_tail : string
+    ; stderr_tail : string
+    }
 end
 
 (** kills a process by sending [signal]; waiting for [wait_for] and then
@@ -37,11 +36,11 @@ end
     caveat: [is_child:false] (the default) is racy: it can both send signals to wrong
     processes and it can also fail to notice that the target died.
 *)
-val kill :
-  ?is_child:bool ->
-  ?wait_for:Time_float.Span.t ->
-  ?signal:Signal.t ->
-  Pid.t
+val kill
+  :  ?is_child:bool
+  -> ?wait_for:Time_float.Span.t
+  -> ?signal:Signal.t
+  -> Pid.t
   -> unit
 
 (**
@@ -49,14 +48,13 @@ val kill :
 
    [stdoutf s len] and [stderrf s len] should only inspect the [String.subo s ~len]
    component of [s]. *)
-val run :
-  ?timeout:Time_float.Span.t
+val run
+  :  ?timeout:Time_float.Span.t
   -> ?use_extra_path:bool
   -> ?working_dir:string
   -> ?setuid:int
   -> ?setgid:int
-  -> ?env:([`Extend of (string * string) list
-           | `Replace of (string * string) list])
+  -> ?env:[ `Extend of (string * string) list | `Replace of (string * string) list ]
   -> ?input:string
   -> ?keep_open:bool
   -> ?stdoutf:(Bytes.t -> int -> unit)

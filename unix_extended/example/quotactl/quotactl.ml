@@ -20,23 +20,23 @@ module Query = struct
           +> anon (String.uppercase id_kind %: string)
           +> anon ("DEVICE" %: Filename_unix.arg_type))
         (fun ~id device () ->
-           let bytes_limit, bytes_usage, inodes_limit, inodes_usage =
-             Or_error.ok_exn (Quota.query user_or_group ~id ~path:device)
-           in
-           printf "== Usage ==\n";
-           printf
-             "  - Bytes  : %s\n"
-             (Int63.to_string (bytes_usage : Quota.bytes Quota.usage :> Int63.t));
-           printf
-             "  - Inodes : %s\n"
-             (Int63.to_string (inodes_usage : Quota.inodes Quota.usage :> Int63.t));
-           printf "== Limits ==\n";
-           printf
-             "  - Bytes  : %s\n"
-             (Sexp.to_string ([%sexp_of: Quota.bytes Quota.limit] bytes_limit));
-           printf
-             "  - Inodes : %s\n"
-             (Sexp.to_string ([%sexp_of: Quota.inodes Quota.limit] inodes_limit))) )
+          let bytes_limit, bytes_usage, inodes_limit, inodes_usage =
+            Or_error.ok_exn (Quota.query user_or_group ~id ~path:device)
+          in
+          printf "== Usage ==\n";
+          printf
+            "  - Bytes  : %s\n"
+            (Int63.to_string (bytes_usage : Quota.bytes Quota.usage :> Int63.t));
+          printf
+            "  - Inodes : %s\n"
+            (Int63.to_string (inodes_usage : Quota.inodes Quota.usage :> Int63.t));
+          printf "== Limits ==\n";
+          printf
+            "  - Bytes  : %s\n"
+            (Sexp.to_string ([%sexp_of: Quota.bytes Quota.limit] bytes_limit));
+          printf
+            "  - Inodes : %s\n"
+            (Sexp.to_string ([%sexp_of: Quota.inodes Quota.limit] inodes_limit))) )
   ;;
 
   let named_command =
@@ -87,27 +87,27 @@ module Modify = struct
           +> flag "-inodes-grace" (optional grace) ~doc:"inode usage grace period"
           +> anon ("DEVICE" %: Filename_unix.arg_type))
         (fun ~id bsoft bhard bgrace isoft ihard igrace device () ->
-           let bytes_limit, _bytes_usage, inodes_limit, _inodes_usage =
-             Or_error.ok_exn (Quota.query user_or_group ~id ~path:device)
-           in
-           let update_limit limit soft hard grace =
-             let optional_update field update =
-               match field with
-               | None -> Fn.id
-               | Some v -> fun l -> update l v
-             in
-             List.fold
-               ~init:limit
-               ~f:(fun acc update -> update acc)
-               [ optional_update soft (fun acc soft -> { acc with Quota.soft })
-               ; optional_update hard (fun acc hard -> { acc with Quota.hard })
-               ; optional_update grace (fun acc grace -> { acc with Quota.grace })
-               ]
-           in
-           let bytes_limit = update_limit bytes_limit bsoft bhard bgrace in
-           let inodes_limit = update_limit inodes_limit isoft ihard igrace in
-           Or_error.ok_exn
-             (Quota.set user_or_group ~id ~path:device bytes_limit inodes_limit)) )
+          let bytes_limit, _bytes_usage, inodes_limit, _inodes_usage =
+            Or_error.ok_exn (Quota.query user_or_group ~id ~path:device)
+          in
+          let update_limit limit soft hard grace =
+            let optional_update field update =
+              match field with
+              | None -> Fn.id
+              | Some v -> fun l -> update l v
+            in
+            List.fold
+              ~init:limit
+              ~f:(fun acc update -> update acc)
+              [ optional_update soft (fun acc soft -> { acc with Quota.soft })
+              ; optional_update hard (fun acc hard -> { acc with Quota.hard })
+              ; optional_update grace (fun acc grace -> { acc with Quota.grace })
+              ]
+          in
+          let bytes_limit = update_limit bytes_limit bsoft bhard bgrace in
+          let inodes_limit = update_limit inodes_limit isoft ihard igrace in
+          Or_error.ok_exn
+            (Quota.set user_or_group ~id ~path:device bytes_limit inodes_limit)) )
   ;;
 
   let named_command =

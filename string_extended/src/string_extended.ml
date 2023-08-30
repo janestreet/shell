@@ -278,11 +278,11 @@ let rec word_wrap__find_substrings ~hard_limit ~soft_limit s acc pos =
 ;;
 
 let word_wrap
-      ?(trailing_nl = false)
-      ?(soft_limit = 80)
-      ?(hard_limit = Int.max_value)
-      ?(nl = "\n")
-      s
+  ?(trailing_nl = false)
+  ?(soft_limit = 80)
+  ?(hard_limit = Int.max_value)
+  ?(nl = "\n")
+  s
   =
   let soft_limit = min soft_limit hard_limit in
   let lines = word_wrap__find_substrings ~soft_limit ~hard_limit s [] 0 in
@@ -341,10 +341,10 @@ let edit_distance_matrix ?transpose s1 s2 =
       in
       let min_d =
         if transpose
-        && x > 1
-        && y > 1
-        && Char.equal s1.[x - 1] s2.[y - 2]
-        && Char.equal s1.[x - 2] s2.[y - 1]
+           && x > 1
+           && y > 1
+           && Char.equal s1.[x - 1] s2.[y - 2]
+           && Char.equal s1.[x - 2] s2.[y - 1]
         then min min_d (d.(x - 2).(y - 2) + 1)
         else min_d
       in

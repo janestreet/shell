@@ -3,7 +3,6 @@
    needed by other modules which are in turn required by the full shell module *)
 
 val extra_path : string list ref
-
 val whoami : ?real:bool -> unit -> string
 val is_executable : string -> bool
 val which : ?use_extra_path:bool -> string -> string option
