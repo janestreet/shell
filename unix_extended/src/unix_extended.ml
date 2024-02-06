@@ -161,7 +161,7 @@ let fork_exec
     then (
       match Shell_internal.which prog with
       | Some s -> s
-      | None -> failwithf "fork_exec: Process not found %s" prog ())
+      | None -> failwithf "fork_exec: File not found %s" prog ())
     else prog
   in
   raw_fork_exec

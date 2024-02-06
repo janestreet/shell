@@ -1,4 +1,7 @@
-(library (name shell) (public_name shell)
+(library
+ (name shell)
+ (public_name shell)
  (libraries textutils.console core core_unix low_level_process shell_internal
-  core_unix.sys_unix)
- (preprocess (pps ppx_jane)))
+   core_unix.sys_unix)
+ (preprocess
+  (pps ppx_jane)))

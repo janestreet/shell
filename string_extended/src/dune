@@ -1,2 +1,6 @@
-(library (name string_extended) (public_name shell.string_extended)
- (libraries core) (preprocess (pps ppx_jane)))
+(library
+ (name string_extended)
+ (public_name shell.string_extended)
+ (libraries core)
+ (preprocess
+  (pps ppx_jane)))

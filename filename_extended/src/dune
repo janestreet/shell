@@ -1,4 +1,7 @@
-(library (name filename_extended) (public_name shell.filename_extended)
+(library
+ (name filename_extended)
+ (public_name shell.filename_extended)
  (libraries core core_unix core_unix.filename_unix shell_internal
-  string_extended core_unix.sys_unix)
- (preprocess (pps ppx_jane)))
+   string_extended core_unix.sys_unix)
+ (preprocess
+  (pps ppx_jane)))
