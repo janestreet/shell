@@ -77,7 +77,8 @@ let%test_module "unescaped_exn" =
       [%expect
         {|
         (Invalid_argument
-         "String_extended.unescaped_exn error at position 2 of \\a: got invalid escape character: a") |}];
+         "String_extended.unescaped_exn error at position 2 of \\a: got invalid escape character: a")
+        |}];
       (* non-strict *)
       require_equal
         [%here]
@@ -90,7 +91,8 @@ let%test_module "unescaped_exn" =
       [%expect
         {|
         (Invalid_argument
-         "String_extended.unescaped_exn error at position 4 of \\512: got invalid escape code 512") |}]
+         "String_extended.unescaped_exn error at position 4 of \\512: got invalid escape code 512")
+        |}]
     ;;
 
     let%expect_test "[unescaped_exn ~strict:true] is equivalent to [Scanf.unescaped], \

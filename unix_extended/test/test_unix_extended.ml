@@ -85,7 +85,8 @@ let%expect_test "[Mount_entry.parse_line]" =
     ((input "even fewer")
      (output (Error ("wrong number of fields" "even fewer"))))
     ((input just_one) (output (Error ("wrong number of fields" just_one))))
-    ((input \) (output (Error ("wrong number of fields" \)))) |}]
+    ((input \) (output (Error ("wrong number of fields" \))))
+    |}]
 ;;
 
 let%expect_test "[Mount_entry.visible_filesystem]" =
@@ -125,7 +126,7 @@ let%expect_test "[Mount_entry.visible_filesystem]" =
        (directory /var)
        (fstype    ext4)
        (options   rw))))
-|}]
+    |}]
 ;;
 
 let%expect_test "[terminal_width]" =

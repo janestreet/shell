@@ -11,11 +11,13 @@ let%expect_test "run_one_line" =
     {|
     (Error
      ("One line expected, got at least two lines of output" (first_line hi)
-      (second_line there))) |}];
+      (second_line there)))
+    |}];
   printf !"%{sexp:string Or_error.t}\n" (Sh.sh_one_line "yes yes");
   [%expect
     {|
     (Error
      ("One line expected, got at least two lines of output" (first_line yes)
-      (second_line yes))) |}]
+      (second_line yes)))
+    |}]
 ;;
