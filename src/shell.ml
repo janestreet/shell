@@ -93,7 +93,7 @@ module Process = struct
       in
       preserve_euid_args @ strict_errors_args
     in
-    { program = "/bin/bash"; arguments = addtl_args @ [ "-c"; s ] }
+    { program = "bash"; arguments = addtl_args @ [ "-c"; s ] }
   ;;
 
   (* avoid asking for the password at all costs. *)
@@ -132,7 +132,7 @@ module Process = struct
       | Some user -> user ^ "@" ^ host
     in
     let args = if quote_args then List.map ~f:Filename.quote args else args in
-    { program = "/usr/bin/ssh"; arguments = ssh_options @ [ url; "--" ] @ args }
+    { program = "ssh"; arguments = ssh_options @ [ url; "--" ] @ args }
   ;;
 
   let remote ?ssh_options ?quote_args ?user ~host cmd =
