@@ -4,7 +4,7 @@
   (names fork_exec unix_extended_stubs))
  (name unix_extended)
  (public_name shell.unix_extended)
- (libraries core shell_internal spawn core_unix.time_float_unix)
+ (libraries core core_unix shell_internal spawn core_unix.time_float_unix)
  (preprocessor_deps config.h)
  (preprocess
   (pps ppx_jane)))

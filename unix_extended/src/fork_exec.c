@@ -1,5 +1,7 @@
 /* Core_unix support functions written in C. */
 
+#undef Hide_upstream_size_macros
+
 #include <stdlib.h>
 #include <signal.h>
 #include <errno.h>

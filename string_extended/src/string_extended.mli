@@ -27,9 +27,9 @@ val collate : string -> string -> int
    raise errors. This mimics the behaviour of the ocaml lexer.
 *)
 val unescaped_exn : ?strict:bool -> string -> string
-  [@@deprecated
-    "[since 2021-08] Consider using [Scanf.unescaped] instead.  Be aware it behaves \
-     differently on inputs containing double-quote characters."]
+[@@deprecated
+  "[since 2021-08] Consider using [Scanf.unescaped] instead.  Be aware it behaves \
+   differently on inputs containing double-quote characters."]
 
 (** [squeeze str] reduces all sequences of spaces, newlines, tabs, and carriage
     returns to single spaces.
@@ -37,7 +37,7 @@ val unescaped_exn : ?strict:bool -> string -> string
 val squeeze : string -> string
 
 val line_break : len:int -> string -> string list
-  [@@deprecated "[since 2021-08] Use [word_wrap] instead."]
+[@@deprecated "[since 2021-08] Use [word_wrap] instead."]
 
 (**
    [word_wrap ~soft_limit s]

@@ -8,6 +8,6 @@
 (executables
  (modes byte exe)
  (names test_low_level_process)
- (libraries low_level_process oUnit)
+ (libraries core low_level_process oUnit)
  (preprocess
   (pps ppx_jane)))

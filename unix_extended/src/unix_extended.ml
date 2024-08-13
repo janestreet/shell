@@ -183,24 +183,6 @@ external ntohl : Int32.t -> Int32.t = "extended_ml_ntohl"
 
 let%test _ = htonl (ntohl 0xdeadbeefl) = 0xdeadbeefl
 
-type statvfs =
-  { bsize : int (** file system block size *)
-  ; frsize : int (** fragment size *)
-  ; blocks : int (** size of fs in frsize units *)
-  ; bfree : int (** # free blocks *)
-  ; bavail : int (** # free blocks for non-root *)
-  ; files : int (** # inodes *)
-  ; ffree : int (** # free inodes *)
-  ; favail : int (** # free inodes for non-root *)
-  ; fsid : int (** file system ID *)
-  ; flag : int (** mount flags *)
-  ; namemax : int (** maximum filename length *)
-  }
-[@@deriving sexp, bin_io]
-
-(** get file system statistics *)
-external statvfs : string -> statvfs = "statvfs_stub"
-
 (** get load averages *)
 external getloadavg : unit -> float * float * float = "getloadavg_stub"
 

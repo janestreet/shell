@@ -67,24 +67,6 @@ external ntohl : Int32.t -> Int32.t = "extended_ml_ntohl"
 (** Host to network order long, like C. *)
 external htonl : Int32.t -> Int32.t = "extended_ml_htonl"
 
-type statvfs =
-  { bsize : int (** file system block size *)
-  ; frsize : int (** fragment size *)
-  ; blocks : int (** size of fs in frsize units *)
-  ; bfree : int (** # free blocks *)
-  ; bavail : int (** # free blocks for non-root *)
-  ; files : int (** # inodes *)
-  ; ffree : int (** # free inodes *)
-  ; favail : int (** # free inodes for non-root *)
-  ; fsid : int (** file system ID *)
-  ; flag : int (** mount flags *)
-  ; namemax : int (** maximum filename length *)
-  }
-[@@deriving sexp, bin_io]
-
-(** get file system statistics *)
-external statvfs : string -> statvfs = "statvfs_stub"
-
 (** get load averages *)
 external getloadavg : unit -> float * float * float = "getloadavg_stub"
 
@@ -105,7 +87,7 @@ module Extended_passwd : sig
 end
 
 val strptime : ?allow_trailing_input:bool -> fmt:string -> string -> Unix.tm
-  [@@deprecated "[since 2019-07] use Core_unix.strptime"]
+[@@deprecated "[since 2019-07] use Core_unix.strptime"]
 
 (** The CIDR module moved into Core_unix *)
 
@@ -126,8 +108,8 @@ module Inet_port : sig
   module Stable : sig
     module V1 :
       Stable_comparable.V1
-        with type t = t
-         and type comparator_witness = comparator_witness
+      with type t = t
+       and type comparator_witness = comparator_witness
   end
 end
 

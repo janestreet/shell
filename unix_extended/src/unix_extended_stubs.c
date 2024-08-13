@@ -51,34 +51,6 @@ CAMLprim value extended_ml_setegid(value egid)
   return Val_unit;
 }
 
-CAMLprim value statvfs_stub (value v_path)
-{
-  CAMLparam1(v_path);
-  CAMLlocal1(v_stat);
-  struct statvfs s;
-  int ret, len = caml_string_length(v_path) + 1;
-  char *pathname = caml_stat_alloc(len);
-  memcpy(pathname, String_val(v_path), len);
-  caml_enter_blocking_section();
-  ret = statvfs(pathname,&s);
-  caml_leave_blocking_section();
-  caml_stat_free(pathname);
-  if (ret != 0) uerror("statvfs",v_path);
-  v_stat = caml_alloc(11, 0);
-  Store_field(v_stat, 0, Val_int(s.f_bsize));
-  Store_field(v_stat, 1, Val_int(s.f_frsize));
-  Store_field(v_stat, 2, Val_int(s.f_blocks));
-  Store_field(v_stat, 3, Val_int(s.f_bfree));
-  Store_field(v_stat, 4, Val_int(s.f_bavail));
-  Store_field(v_stat, 5, Val_int(s.f_files));
-  Store_field(v_stat, 6, Val_int(s.f_ffree));
-  Store_field(v_stat, 7, Val_int(s.f_favail));
-  Store_field(v_stat, 8, Val_int(s.f_fsid));
-  Store_field(v_stat, 9, Val_int(s.f_flag));
-  Store_field(v_stat,10, Val_int(s.f_namemax));
-  CAMLreturn(v_stat);
-}
-
 CAMLprim value getloadavg_stub (value v_unit __unused)
 {
   CAMLparam0();

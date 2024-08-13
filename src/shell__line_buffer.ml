@@ -77,7 +77,11 @@ let rec add_substring' blit get buffer_add b s ~pos ~len =
 ;;
 
 let add_substring = add_substring' Bytes.From_string.blit String.get Buffer.add_substring
-let add_subbytes = add_substring' Bytes.blit Bytes.get Buffer.add_subbytes
+
+let add_subbytes =
+  add_substring' Bytes.blit (fun b i -> Bytes.get b i) Buffer.add_subbytes
+;;
+
 let add_string b s = add_substring b s ~pos:0 ~len:(String.length s)
 
 (** [test_list l]: adds all the strings in [l] to a new blank buffer and

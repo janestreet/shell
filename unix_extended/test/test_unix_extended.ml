@@ -20,11 +20,11 @@ let%expect_test "[Mount_entry.parse_line]" =
     ; "\\"
     ]
     ~f:(fun input ->
-    print_s
-      [%message
-        ""
-          (input : string)
-          ~output:(Mount_entry.parse_line input : Mount_entry.t option Or_error.t)]);
+      print_s
+        [%message
+          ""
+            (input : string)
+            ~output:(Mount_entry.parse_line input : Mount_entry.t option Or_error.t)]);
   [%expect
     {|
     ((input "/dev/mapper/vg01-root / ext4 defaults 0 0")
@@ -135,7 +135,8 @@ let%expect_test "[terminal_width]" =
   (* we just assert that we got some positive/non-zero width and height. *)
   print_s ([%sexp_of: bool] (width > 0));
   print_s ([%sexp_of: bool] (height > 0));
-  [%expect {|
+  [%expect
+    {|
     true
     true
     |}]

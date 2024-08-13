@@ -109,14 +109,14 @@ val run_one_line : ?eol:char -> string Or_error.t cmd with_run_flags
 val run_one_line_exn : ?eol:char -> string cmd with_run_flags
 
 val run_one : ?eol:char -> string option cmd with_run_flags
-  [@@deprecated
-    "[since 2017-11] Use [run_one_line] to get a different behavior or [run_first_line] \
-     to get the old behavior"]
+[@@deprecated
+  "[since 2017-11] Use [run_one_line] to get a different behavior or [run_first_line] to \
+   get the old behavior"]
 
 val run_one_exn : ?eol:char -> string cmd with_run_flags
-  [@@deprecated
-    "[since 2017-11] Use [run_one_line_exn] to get a different behavior or \
-     [run_first_line_exn] to get the old behavior"]
+[@@deprecated
+  "[since 2017-11] Use [run_one_line_exn] to get a different behavior or \
+   [run_first_line_exn] to get the old behavior"]
 
 (** Return the full command's output in one string. See the note in
     [run_lines].
@@ -156,14 +156,14 @@ val sh_lines : ('a, string list) sh_cmd with_run_flags with_sh_flags
 val sh_full : ('a, string) sh_cmd with_run_flags with_sh_flags
 
 val sh_one : ('a, string option) sh_cmd with_run_flags with_sh_flags
-  [@@deprecated
-    "[since 2017-11] Use [sh_one_line] to get a different behavior or [sh_first_line] to \
-     get the old behavior"]
+[@@deprecated
+  "[since 2017-11] Use [sh_one_line] to get a different behavior or [sh_first_line] to \
+   get the old behavior"]
 
 val sh_one_exn : ('a, string) sh_cmd with_run_flags with_sh_flags
-  [@@deprecated
-    "[since 2017-11] Use [sh_one_line_exn] to get a different behavior or \
-     [sh_first_line_exn] to get the old behavior"]
+[@@deprecated
+  "[since 2017-11] Use [sh_one_line_exn] to get a different behavior or \
+   [sh_first_line_exn] to get the old behavior"]
 
 val sh_one_line : ('a, string Or_error.t) sh_cmd with_run_flags with_sh_flags
 val sh_one_line_exn : ('a, string) sh_cmd with_run_flags with_sh_flags
@@ -183,14 +183,14 @@ val ssh_lines : ('a, string list) sh_cmd with_run_flags with_ssh_flags
 val ssh_full : ('a, string) sh_cmd with_run_flags with_ssh_flags
 
 val ssh_one : ('a, string option) sh_cmd with_run_flags with_ssh_flags
-  [@@deprecated
-    "[since 2017-11] Use [ssh_one_line] to get a different behavior or [ssh_first_line] \
-     to get the old behavior"]
+[@@deprecated
+  "[since 2017-11] Use [ssh_one_line] to get a different behavior or [ssh_first_line] to \
+   get the old behavior"]
 
 val ssh_one_exn : ('a, string) sh_cmd with_run_flags with_ssh_flags
-  [@@deprecated
-    "[since 2017-11] Use [ssh_one_line_exn] to get a different behavior or \
-     [ssh_first_line_exn] to get the old behavior"]
+[@@deprecated
+  "[since 2017-11] Use [ssh_one_line_exn] to get a different behavior or \
+   [ssh_first_line_exn] to get the old behavior"]
 
 val ssh_one_line : ('a, string Or_error.t) sh_cmd with_run_flags with_ssh_flags
 val ssh_one_line_exn : ('a, string) sh_cmd with_run_flags with_ssh_flags
