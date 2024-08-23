@@ -1,6 +1,5 @@
 open Core
 open Filename
-open Poly
 module Unix = Core_unix
 
 (** Path *)
@@ -39,13 +38,13 @@ let normalize_path p =
 ;;
 
 let make_relative ?to_ f =
-  if to_ = None && is_relative f
+  if Option.is_none to_ && is_relative f
   then f
   else (
     let to_ =
       match to_ with
       | Some dir ->
-        if is_relative f <> is_relative dir
+        if Bool.( <> ) (is_relative f) (is_relative dir)
         then
           failwithf
             "make_relative ~to_:%s %s: cannot work on an absolute path and a relative one"
@@ -78,10 +77,17 @@ let%test_module "make_relative" =
       | Failure _ -> None
     ;;
 
-    let%test _ = make_relative ~to_:".." "a" = None
-    let%test _ = make_relative ~to_:".." "../a" = Some "a"
-    let%test _ = make_relative ~to_:"c" "a/b" = Some "../a/b"
-    let%test _ = make_relative ~to_:"/" "a/b" = None
+    let is_none = Option.is_none
+
+    let is_some s = function
+      | Some s' when equal s s' -> true
+      | None | Some _ -> false
+    ;;
+
+    let%test _ = make_relative ~to_:".." "a" |> is_none
+    let%test _ = make_relative ~to_:".." "../a" |> is_some "a"
+    let%test _ = make_relative ~to_:"c" "a/b" |> is_some "../a/b"
+    let%test _ = make_relative ~to_:"/" "a/b" |> is_none
   end)
 ;;
 
@@ -97,14 +103,18 @@ let%test_module "normalize" =
   end)
 ;;
 
-let ( // ) src p = if is_absolute p then p else concat src p
-let make_absolute p = Sys_unix.getcwd () // p
+(* The "^" in these operator names is to make them right-associative.
+   It's important for them to be right-associative so that the short-circuiting works
+   correctly if you chain them. *)
+let ( ^/// ) src p = if is_absolute p then p else concat (src ()) p
+let ( ^// ) src p = (fun () -> src) ^/// p
+let make_absolute p = Sys_unix.getcwd ^/// p
 
 let user_home username =
   match Unix.Passwd.getbyname username with
   | Some user ->
     let pw_dir = user.Unix.Passwd.dir in
-    if String.length pw_dir = 0
+    if Int.( = ) (String.length pw_dir) 0
     then failwithf "user's \"%s\"'s home is an empty string" username ()
     else pw_dir
   | None -> failwithf "user \"%s\" not found" username ()
@@ -123,7 +133,7 @@ let expand_user s =
   else s
 ;;
 
-let expand ?(from = ".") p = normalize (Sys_unix.getcwd () // from // expand_user p)
+let expand ?(from = ".") p = normalize (Sys_unix.getcwd ^/// from ^// expand_user p)
 
 let rec is_parent_path p1 p2 =
   match p1, p2 with
@@ -208,5 +218,5 @@ let with_open_temp_file ?in_dir ?(write = ignore) ~f prefix suffix =
 
 let with_temp_dir ?in_dir prefix suffix ~f =
   protectx (Filename_unix.temp_dir ?in_dir prefix suffix) ~f ~finally:(fun dirname ->
-    ignore (Sys_unix.command (sprintf "rm -rf '%s'" dirname)))
+    ignore (Sys_unix.command (sprintf "rm -rf '%s'" dirname) : int))
 ;;
