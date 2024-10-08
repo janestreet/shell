@@ -70,38 +70,34 @@ let make_relative ?to_ f =
     implode (aux (to_, f)))
 ;;
 
-let%test_module "make_relative" =
-  (module struct
-    let make_relative ~to_ f =
-      try Some (make_relative ~to_ f) with
-      | Failure _ -> None
-    ;;
+module%test [@name "make_relative"] _ = struct
+  let make_relative ~to_ f =
+    try Some (make_relative ~to_ f) with
+    | Failure _ -> None
+  ;;
 
-    let is_none = Option.is_none
+  let is_none = Option.is_none
 
-    let is_some s = function
-      | Some s' when equal s s' -> true
-      | None | Some _ -> false
-    ;;
+  let is_some s = function
+    | Some s' when equal s s' -> true
+    | None | Some _ -> false
+  ;;
 
-    let%test _ = make_relative ~to_:".." "a" |> is_none
-    let%test _ = make_relative ~to_:".." "../a" |> is_some "a"
-    let%test _ = make_relative ~to_:"c" "a/b" |> is_some "../a/b"
-    let%test _ = make_relative ~to_:"/" "a/b" |> is_none
-  end)
-;;
+  let%test _ = make_relative ~to_:".." "a" |> is_none
+  let%test _ = make_relative ~to_:".." "../a" |> is_some "a"
+  let%test _ = make_relative ~to_:"c" "a/b" |> is_some "../a/b"
+  let%test _ = make_relative ~to_:"/" "a/b" |> is_none
+end
 
 let normalize p = implode (normalize_path (explode p))
 
-let%test_module "normalize" =
-  (module struct
-    let%test "id" = normalize "/mnt/local" = "/mnt/local"
-    let%test "dot_dotdot" = normalize "/mnt/./../local" = "/local"
-    let%test _ = normalize "/mnt/local/../global/foo" = "/mnt/global/foo"
-    let%test "beyond_root" = normalize "/mnt/local/../../.." = "/"
-    let%test "negative_lookahead" = normalize "../a/../../b" = "../../b"
-  end)
-;;
+module%test [@name "normalize"] _ = struct
+  let%test "id" = normalize "/mnt/local" = "/mnt/local"
+  let%test "dot_dotdot" = normalize "/mnt/./../local" = "/local"
+  let%test _ = normalize "/mnt/local/../global/foo" = "/mnt/global/foo"
+  let%test "beyond_root" = normalize "/mnt/local/../../.." = "/"
+  let%test "negative_lookahead" = normalize "../a/../../b" = "../../b"
+end
 
 (* The "^" in these operator names is to make them right-associative.
    It's important for them to be right-associative so that the short-circuiting works
@@ -196,13 +192,11 @@ let filename_compare map v1 v2 =
 
 let parent p = normalize (concat p parent_dir_name)
 
-let%test_module "parent" =
-  (module struct
-    let%test _ = parent "/mnt/local" = "/mnt"
-    let%test _ = parent "/mnt/local/../global/foo" = "/mnt/global"
-    let%test _ = parent "/mnt/local/../../global" = "/"
-  end)
-;;
+module%test [@name "parent"] _ = struct
+  let%test _ = parent "/mnt/local" = "/mnt"
+  let%test _ = parent "/mnt/local/../global/foo" = "/mnt/global"
+  let%test _ = parent "/mnt/local/../../global" = "/"
+end
 
 let extension_map = create_extension_map [ [ "h"; "c" ]; [ "mli"; "ml" ] ]
 let compare = filename_compare extension_map
