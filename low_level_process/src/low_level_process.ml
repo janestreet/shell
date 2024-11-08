@@ -438,40 +438,38 @@ let kill ?is_child ?wait_for ?(signal = Signal.term) pid =
   kill ?is_child ?wait_for ~signal pid
 ;;
 
-let%test_module _ =
-  (module struct
-    let with_fds n ~f =
-      let restore_max_fds =
-        let module RLimit = Core_unix.RLimit in
-        let max_fds = RLimit.get RLimit.num_file_descriptors in
-        match max_fds.RLimit.cur with
-        | RLimit.Infinity -> None
-        | RLimit.Limit limit when Int64.(of_int Int.(2 * n) < limit) -> None
-        | RLimit.Limit _ ->
-          RLimit.set
-            RLimit.num_file_descriptors
-            { max_fds with RLimit.cur = RLimit.Limit (Int64.of_int (2 * n)) };
-          Some max_fds
-      in
-      let fds =
-        List.init n ~f:(fun _ -> Unix.openfile ~mode:[ Unix.O_RDONLY ] "/dev/null")
-      in
-      let retval = Or_error.try_with f in
-      List.iter fds ~f:(fun fd -> Unix.close fd);
-      Option.iter restore_max_fds ~f:(fun max_fds ->
-        let module RLimit = Core_unix.RLimit in
-        RLimit.set RLimit.num_file_descriptors max_fds);
-      Or_error.ok_exn retval
-    ;;
+module%test _ = struct
+  let with_fds n ~f =
+    let restore_max_fds =
+      let module RLimit = Core_unix.RLimit in
+      let max_fds = RLimit.get RLimit.num_file_descriptors in
+      match max_fds.RLimit.cur with
+      | RLimit.Infinity -> None
+      | RLimit.Limit limit when Int64.(of_int Int.(2 * n) < limit) -> None
+      | RLimit.Limit _ ->
+        RLimit.set
+          RLimit.num_file_descriptors
+          { max_fds with RLimit.cur = RLimit.Limit (Int64.of_int (2 * n)) };
+        Some max_fds
+    in
+    let fds =
+      List.init n ~f:(fun _ -> Unix.openfile ~mode:[ Unix.O_RDONLY ] "/dev/null")
+    in
+    let retval = Or_error.try_with f in
+    List.iter fds ~f:(fun fd -> Unix.close fd);
+    Option.iter restore_max_fds ~f:(fun max_fds ->
+      let module RLimit = Core_unix.RLimit in
+      RLimit.set RLimit.num_file_descriptors max_fds);
+    Or_error.ok_exn retval
+  ;;
 
-    let run_process () = ignore (run ~prog:"true" ~args:[] ())
-    let%test_unit _ = with_fds 10 ~f:run_process
+  let run_process () = ignore (run ~prog:"true" ~args:[] ())
+  let%test_unit _ = with_fds 10 ~f:run_process
 
-    let%test_unit _ =
-      with_fds 1055 ~f:(fun () ->
-        [%test_eq: bool]
-          (Result.is_ok Linux_ext.Epoll.create)
-          (Result.is_ok (Result.try_with run_process)))
-    ;;
-  end)
-;;
+  let%test_unit _ =
+    with_fds 1055 ~f:(fun () ->
+      [%test_eq: bool]
+        (Result.is_ok Linux_ext.Epoll.create)
+        (Result.is_ok (Result.try_with run_process)))
+  ;;
+end
