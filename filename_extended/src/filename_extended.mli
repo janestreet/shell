@@ -4,8 +4,8 @@
     is absolute they will all be removed. *)
 val normalize : string -> string
 
-(** [parent path] The parent of the root directory is the root directory @return the path
-    to the parent of [path]. *)
+(** [parent path] The parent of the root directory is the root directory
+    @return the path to the parent of [path]. *)
 val parent : string -> string
 
 (** [make_relative ~to_:src f] returns [f] relative to [src].
@@ -17,7 +17,7 @@ val make_relative : ?to_:string -> string -> string
     directory. *)
 val make_absolute : string -> string
 
-(** [expand] Makes a path absolute and expands [~] [~username] to home directories.  In
+(** [expand] Makes a path absolute and expands [~] [~username] to home directories. In
     case of error (e.g.: path home of a none existing user) raises [Failure] with a
     (hopefully) helpful message. *)
 val expand : ?from:string -> string -> string
@@ -65,7 +65,6 @@ val with_temp_dir : ?in_dir:string -> string -> string -> f:(string -> 'a) -> 'a
     - A directory is always the parent of itself.
     - The root is the parent of any directory
     - An absolute path is never the parent of relative one and vice versa.
-    - ["../../a"] is never the parent of ["."] even if this could be true given
-      form the current working directory.
-*)
+    - ["../../a"] is never the parent of ["."] even if this could be true given form the
+      current working directory. *)
 val is_parent : string -> string -> bool

@@ -1,9 +1,7 @@
-(**
-   Low-level process handling
+(** Low-level process handling
 
-   This is low-level enough that you should probably be using [Shell] instead
-   to dispatch processes.
-*)
+    This is low-level enough that you should probably be using [Shell] instead to dispatch
+    processes. *)
 
 open! Core
 
@@ -26,16 +24,14 @@ module Command_result : sig
     }
 end
 
-(** kills a process by sending [signal]; waiting for [wait_for] and then
-    sending a [sigkill].
-    You need to set is_child to true when killing child processes or run waitpid
-    on them in another.
-    @raises Failure if the target program hangs for more that [wait_for] after
-    receiving the [sigkill].
+(** kills a process by sending [signal]; waiting for [wait_for] and then sending a
+    [sigkill]. You need to set is_child to true when killing child processes or run
+    waitpid on them in another.
+    @raise Failure
+      if the target program hangs for more that [wait_for] after receiving the [sigkill].
 
-    caveat: [is_child:false] (the default) is racy: it can both send signals to wrong
-    processes and it can also fail to notice that the target died.
-*)
+      caveat: [is_child:false] (the default) is racy: it can both send signals to wrong
+      processes and it can also fail to notice that the target died. *)
 val kill
   :  ?is_child:bool
   -> ?wait_for:Time_float.Span.t
@@ -43,11 +39,10 @@ val kill
   -> Pid.t
   -> unit
 
-(**
-   Runs the process.
+(** Runs the process.
 
-   [stdoutf s len] and [stderrf s len] should only inspect the [String.subo s ~len]
-   component of [s]. *)
+    [stdoutf s len] and [stderrf s len] should only inspect the [String.subo s ~len]
+    component of [s]. *)
 val run
   :  ?timeout:Time_float.Span.t
   -> ?use_extra_path:bool

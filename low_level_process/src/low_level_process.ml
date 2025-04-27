@@ -67,14 +67,10 @@ let internal_create_process ?working_dir ?setuid ?setgid ~env ~prog ~args () =
     raise e
 ;;
 
-(**
-   Remembers the last n-characters appended to it....
-*)
+(** Remembers the last n-characters appended to it.... *)
 module Tail_buffer = struct
-  (** remembers the output in a circular buffer.
-      looped is used to tell whether we loop around the
-      boundary of the buffer.
-  *)
+  (** remembers the output in a circular buffer. looped is used to tell whether we loop
+      around the boundary of the buffer. *)
   type t =
     { buffer : Bytes.t
     ; length : int
@@ -165,10 +161,8 @@ let waitpid_nohang pid =
     Some res
 ;;
 
-(** wait for a given pid to exit;
-    returns true when the process exits and false if the process is still runing
-    after waiting for [span]
-*)
+(** wait for a given pid to exit; returns true when the process exits and false if the
+    process is still runing after waiting for [span] *)
 let wait_for_exit ~is_child span pid =
   let end_time = Time.add (Time.now ()) span in
   let exited () =
@@ -409,7 +403,7 @@ let run
   in
   let status =
     protectx
-      ( Sys.signal Sys.sigpipe Sys.Signal_ignore
+      ( (Sys.signal [@ocaml.alert "-unsafe_multidomain"]) Sys.sigpipe Sys.Signal_ignore
       , create
           ~keep_open
           ~use_extra_path
@@ -425,7 +419,9 @@ let run
       ~f:(fun (_old_sigpipe, state) -> run_loop state ~start_time:(Time.now ()) ~timeout)
       ~finally:(fun (old_sigpipe, state) ->
         List.iter state.open_fds ~f:close_non_intr;
-        ignore (Sys.signal Sys.sigpipe old_sigpipe : Sys.signal_behavior))
+        ignore
+          ((Sys.signal [@ocaml.alert "-unsafe_multidomain"]) Sys.sigpipe old_sigpipe
+           : Sys.signal_behavior))
   in
   { Command_result.status
   ; stdout_tail = Tail_buffer.contents stdout_tail

@@ -1,39 +1,33 @@
 (** Shell scripting in OCaml.
 
-    This module contains basic blocks for shell scripting in OCaml. It tends to
-    be safer than just using [Unix.system] because it handles errors more
-    strictly.
-*)
+    This module contains basic blocks for shell scripting in OCaml. It tends to be safer
+    than just using [Unix.system] because it handles errors more strictly. *)
 open! Core
 
 module Unix := Core_unix
 
-(** {6 Process handling }  *)
+(** {6 Process handling} *)
 
-(**
-   This type is an umbrella type for all the command that dispatch a process.
-   It comes with a list of arguments whose default value can be tweaked by
-   set_defaults.
+(** This type is an umbrella type for all the command that dispatch a process. It comes
+    with a list of arguments whose default value can be tweaked by set_defaults.
 
-   - [use_extra_path] : if we fail to find the command in the path then we look for it
-     [extra_path]
-   - [timeout]        : the command will raise [Failed] if the program doesn't
-     do any IO for this period of time
-   - [working_dir]    : run the command in this directory
-   - [verbose]        : prints the output of the command
-   - [echo]           : print out the command before running it
-   - [input]          : a string to pipe through the program's standard in
-   - [env]            : controls the environment variables passed to the command
-   - [preserve_euid]  : pass the '-p' option to bash when running the command; this should
-     disable the default bash behavior of replacing the effective user
-     ID with the current value of the real user ID, useful in programs
-     where privileges are escalated and de-escalated using seteuid(2)
-   - [strict_errors]  : pass '-eu -o pipefail' options to bash when running the
-     command
+    - [use_extra_path] : if we fail to find the command in the path then we look for it
+      [extra_path]
+    - [timeout] : the command will raise [Failed] if the program doesn't do any IO for
+      this period of time
+    - [working_dir] : run the command in this directory
+    - [verbose] : prints the output of the command
+    - [echo] : print out the command before running it
+    - [input] : a string to pipe through the program's standard in
+    - [env] : controls the environment variables passed to the command
+    - [preserve_euid] : pass the '-p' option to bash when running the command; this should
+      disable the default bash behavior of replacing the effective user ID with the
+      current value of the real user ID, useful in programs where privileges are escalated
+      and de-escalated using seteuid(2)
+    - [strict_errors] : pass '-eu -o pipefail' options to bash when running the command
 
-   WARNING: the input argument to this function should not be used because
-   it can deadlock if the input is too big (~160kb?)
-*)
+    WARNING: the input argument to this function should not be used because it can
+    deadlock if the input is too big (~160kb?) *)
 type 'a with_process_flags =
   ?use_extra_path:bool
   -> ?timeout:Time_float.Span.t option
@@ -48,60 +42,53 @@ type 'a with_process_flags =
   -> ?tail_len:int
   -> 'a
 
-(**
-   This is the list of flags for normal process dispatch. It is an extension of
-   [with_process_flags].
+(** This is the list of flags for normal process dispatch. It is an extension of
+    [with_process_flags].
 
-   - [expect] : an int list of valid return codes. default value is [[0]], if
-     the return code of the dispatched is not in this list we will blowup with
-     [Process.Failure]
-*)
+    - [expect] : an int list of valid return codes. default value is [[0]], if the return
+      code of the dispatched is not in this list we will blowup with [Process.Failure] *)
 type 'a with_run_flags = ?expect:int list -> 'a with_process_flags
 
 (** {9 Basic run functions}
 
-    In all the functions below the command is specified with two arguments.  The
-    first one is a string representing the process to run.  The second one is
-    the list of arguments to pass.
+    In all the functions below the command is specified with two arguments. The first one
+    is a string representing the process to run. The second one is the list of arguments
+    to pass.
 
-    Although the arguments do not need to be escaped there is still a risk that
-    they might be interpreted as flags when they aren't. Most basic unix
-    utilities provide the ability to pass arguments after "--" to avoid this.
+    Although the arguments do not need to be escaped there is still a risk that they might
+    be interpreted as flags when they aren't. Most basic unix utilities provide the
+    ability to pass arguments after "--" to avoid this.
 
     Usage example:
     {[
-      let patch = run_full ~expect:[0;1] "diff" ["-u";"--";file1;file2]
-    ]}
-*)
+      let patch = run_full ~expect:[ 0; 1 ] "diff" [ "-u"; "--"; file1; file2 ]
+    ]} *)
 
 type 'a cmd = string -> string list -> 'a
 
 (** Runs a command and discards its output. *)
 val run : unit cmd with_run_flags
 
-(** Runs a command and returns its output line separated. Note: most commands
-    print a newline at the end of their output so the shell prompt appears on
-    its own line. If the output ends in a newline, it is stripped before
-    splitting the output into a string list to avoid there being a final
-    element in the list containing just the empty string.
+(** Runs a command and returns its output line separated. Note: most commands print a
+    newline at the end of their output so the shell prompt appears on its own line. If the
+    output ends in a newline, it is stripped before splitting the output into a string
+    list to avoid there being a final element in the list containing just the empty
+    string.
 
-    In some cases, the newline should not be stripped (e.g., "cat" will not
-    "add" a newline). If you care, use [run_full] for the entire buffer.
-*)
+    In some cases, the newline should not be stripped (e.g., "cat" will not "add" a
+    newline). If you care, use [run_full] for the entire buffer. *)
 val run_lines : ?eol:char -> string list cmd with_run_flags
 
 (** Returns the first line of the command's output.
 
-    This function might terminate the program early the same way that
-    piping through [head -n 1] would. When that happens, exit code of the
-    program gets ignored!
-*)
+    This function might terminate the program early the same way that piping through
+    [head -n 1] would. When that happens, exit code of the program gets ignored! *)
 val run_first_line : ?eol:char -> string option cmd with_run_flags
 
 val run_first_line_exn : ?eol:char -> string cmd with_run_flags
 
-(** Returns the only line of the command's output.
-    If the command prints zero or multiple lines this returns an [Error].
+(** Returns the only line of the command's output. If the command prints zero or multiple
+    lines this returns an [Error].
 
     If the command exits with non-zero exit code it raises an exception. *)
 val run_one_line : ?eol:char -> string Or_error.t cmd with_run_flags
@@ -118,16 +105,12 @@ val run_one_exn : ?eol:char -> string cmd with_run_flags
   "[since 2017-11] Use [run_one_line_exn] to get a different behavior or \
    [run_first_line_exn] to get the old behavior"]
 
-(** Return the full command's output in one string. See the note in
-    [run_lines].
-*)
+(** Return the full command's output in one string. See the note in [run_lines]. *)
 val run_full : string cmd with_run_flags
 
-(** Fold over the lines in the stdout of a process;
-    The `Continue/`Stop argument is there to allow early returning.
-    [eol] specifies the end of line character used to separate the lines
-    outputted by the the program
-*)
+(** Fold over the lines in the stdout of a process; The `Continue/`Stop argument is there
+    to allow early returning. [eol] specifies the end of line character used to separate
+    the lines outputted by the the program *)
 val run_fold
   :  ?eol:char
   -> init:'a
@@ -140,13 +123,12 @@ val run_fold
 
     Usage example:
     {[
-      sh "cp -- %s %s" (Filename.quote file1)  (Filename.quote file2)
+      sh "cp -- %s %s" (Filename.quote file1) (Filename.quote file2)
     ]}
 
-    In general it is recommended to avoid using those too much and to prefer the
-    run* family of function instead because it avoids pitfall like escaping
-    issues and is much more straightforward to think about.
-*)
+    In general it is recommended to avoid using those too much and to prefer the run*
+    family of function instead because it avoids pitfall like escaping issues and is much
+    more straightforward to think about. *)
 
 type ('a, 'ret) sh_cmd = ('a, unit, string, 'ret) format4 -> 'a
 type 'a with_sh_flags = ?strict_errors:bool -> 'a
@@ -201,40 +183,35 @@ val ssh_first_line_exn : ('a, string) sh_cmd with_run_flags with_ssh_flags
 
     Usage example:
     {[
-      if Shell.test "diff" ["-q";"--";file1;file2] then
-        Printf.printf "Files %S and %S are the same\n%!" file1 file2;
-    ]}
+      if Shell.test "diff" [ "-q"; "--"; file1; file2 ]
+      then Printf.printf "Files %S and %S are the same\n%!" file1 file2
+    ]} *)
 
-*)
-
-(** This is the list of flags for dispatching processes in test mode. This is
-    used to test the return code of the dispatched program. The return value of
-    these functions will be :
+(** This is the list of flags for dispatching processes in test mode. This is used to test
+    the return code of the dispatched program. The return value of these functions will be
+    :
     - [true] if the exit code is in [true_v].
     - [false] if the exit code is in [false_v] and not in [true_v].
     - Raises [Process.Failure] otherwise
 
     The default values are:
     - [true_v]: default value [[0]]
-    - [false_v]: default_value [[1]]
-*)
+    - [false_v]: default_value [[1]] *)
 type 'a with_test_flags = ?true_v:int list -> ?false_v:int list -> 'a with_process_flags
 
 val test : bool cmd with_test_flags
 val sh_test : ('a, bool) sh_cmd with_test_flags with_sh_flags
 val ssh_test : ('a, bool) sh_cmd with_test_flags with_ssh_flags
 
-(** variable used by dispatch command to find binaries not in the path.
-    The default values contains only directory which should be in PATH and is
-    only useful in environments where the PATH variable has been blown away.
-*)
+(** variable used by dispatch command to find binaries not in the path. The default values
+    contains only directory which should be in PATH and is only useful in environments
+    where the PATH variable has been blown away. *)
 val extra_path : string list ref
 
 (** Process dispatching *)
 module Process : sig
-  (** The termination status of a process.
-      This is an extension of [Unix.Process_status.t] to allow timeouts.
-  *)
+  (** The termination status of a process. This is an extension of [Unix.Process_status.t]
+      to allow timeouts. *)
   type status =
     [ `Timeout of Time_float.Span.t
     | `Exited of int
@@ -323,15 +300,14 @@ val ln : ?s:unit -> ?f:unit -> string -> string -> unit
       flag is not passed, which is not the case for an interactive usage of a shell "rm"
       command;
     - When called on a non-existent file, [rm file] would raise, while [rm ~f:() file]
-      would succeed.
-*)
+      would succeed. *)
 val rm : ?r:unit -> ?f:unit -> string -> unit
 
 (** Raises "Failed_command" *)
 val mv : string -> string -> unit
 
-(** Get the username. By default, the effective username. If real is true, get
-    the real username. *)
+(** Get the username. By default, the effective username. If real is true, get the real
+    username. *)
 val whoami : ?real:bool -> unit -> string
 
 val which : ?use_extra_path:bool -> string -> string option

@@ -60,7 +60,7 @@ module Process = struct
   ;;
 
   let () =
-    Stdlib.Printexc.register_printer (function
+    (Stdlib.Printexc.register_printer [@ocaml.alert "-unsafe_multidomain"]) (function
       | Failed r -> Some (format_failed r)
       | _ -> None)
   ;;
