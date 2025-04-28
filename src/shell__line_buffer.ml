@@ -1,10 +1,8 @@
 open Core
 open Poly
 
-(** Look for a newline in a given substring and returns its
-    absolute position.
-    Returns None if no newlines are found.
-*)
+(** Look for a newline in a given substring and returns its absolute position. Returns
+    None if no newlines are found. *)
 let rec nl_between
   (get : 'a -> int -> char)
   (s : 'a)
@@ -25,18 +23,15 @@ let%test _ = nl_between String.get "a\nb\ncd" ~eol:'\n' ~pos:0 ~len:6 = Some 1
 let%test _ = nl_between String.get "a\nb\ncd" ~eol:'\n' ~pos:3 ~len:3 = Some 3
 let%test _ = nl_between String.get "a\nb\ncd" ~eol:'\n' ~pos:4 ~len:2 = None
 
-(**
-   Type for line buffers.
-   [flush] will be called back on every fully read newline or when the buffer
-   itself is flushed by the user.
-*)
+(** Type for line buffers. [flush] will be called back on every fully read newline or when
+    the buffer itself is flushed by the user. *)
 type t =
   { buffer : Buffer.t
   ; eol : char
   ; flush : string -> unit
   }
 
-(*  *)
+(* *)
 let create ?(eol = '\n') flush = { buffer = Buffer.create 0; eol; flush }
 
 let flush b =
@@ -84,8 +79,8 @@ let add_subbytes =
 
 let add_string b s = add_substring b s ~pos:0 ~len:(String.length s)
 
-(** [test_list l]: adds all the strings in [l] to a new blank buffer and
-    returns all the lines that the callback function was called on.*)
+(** [test_list l]: adds all the strings in [l] to a new blank buffer and returns all the
+    lines that the callback function was called on. *)
 let test_list l =
   let lines = ref [] in
   let b = create (fun s -> lines := s :: !lines) in

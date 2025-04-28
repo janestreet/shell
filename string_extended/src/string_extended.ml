@@ -74,9 +74,7 @@ let collate s1 s2 =
   loop ()
 ;;
 
-(**
-   Inverse operation of [String.escaped]
-*)
+(** Inverse operation of [String.escaped] *)
 exception Unescape_error of bool * int * string
 
 (* The stdlib's escaped does a lot of fancy wazoo magic to avoid
