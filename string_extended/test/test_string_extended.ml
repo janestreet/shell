@@ -88,17 +88,15 @@ module%test [@name "unescaped_exn"] _ = struct
       String.quickcheck_generator
       ~sexp_of:[%sexp_of: string]
       ~f:(fun s -> Exn.does_raise (fun () -> unescaped_exn ~strict:true s));
-    quickcheck_m
-      (module String)
-      ~f:(fun s ->
-        let s =
-          unstage (String.Escaping.escape ~escapeworthy:[ '\"' ] ~escape_char:'\\') s
-        in
-        Expect_test_helpers_core.require_equal
-          (module struct
-            type t = (string, (exn[@equal.ignore])) Result.t [@@deriving equal, sexp_of]
-          end)
-          (Result.try_with (fun () -> unescaped_exn s ~strict:true))
-          (Result.try_with (fun () -> Scanf.unescaped s)))
+    quickcheck_m (module String) ~f:(fun s ->
+      let s =
+        unstage (String.Escaping.escape ~escapeworthy:[ '\"' ] ~escape_char:'\\') s
+      in
+      Expect_test_helpers_core.require_equal
+        (module struct
+          type t = (string, (exn[@equal.ignore])) Result.t [@@deriving equal, sexp_of]
+        end)
+        (Result.try_with (fun () -> unescaped_exn s ~strict:true))
+        (Result.try_with (fun () -> Scanf.unescaped s)))
   ;;
 end
