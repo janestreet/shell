@@ -206,7 +206,7 @@ val ssh_test : ('a, bool) sh_cmd with_test_flags with_ssh_flags
 (** variable used by dispatch command to find binaries not in the path. The default values
     contains only directory which should be in PATH and is only useful in environments
     where the PATH variable has been blown away. *)
-val extra_path : string list ref
+val extra_path : string list Dynamic.t
 
 (** Process dispatching *)
 module Process : sig
@@ -226,6 +226,7 @@ module Process : sig
     ; stdout : string
     ; stderr : string
     }
+  [@@unsafe_allow_any_mode_crossing]
 
   exception Failed of result
 

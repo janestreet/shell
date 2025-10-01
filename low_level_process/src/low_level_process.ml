@@ -2,7 +2,11 @@ open Core
 open Poly
 module Unix = Core_unix
 module Time = Time_float_unix
-module Sys = Stdlib.Sys
+
+module Sys = struct
+  include Stdlib.Sys
+  include Basement.Stdlib_shim.Sys.Safe
+end
 
 let rec temp_failure_retry f =
   try f () with
@@ -308,7 +312,7 @@ let available_fds =
   in
   match Linux_ext.Epoll.create with
   | Error _ -> use_select
-  | Ok epoll_create -> use_epoll epoll_create
+  | Ok epoll_create -> [%eta (use_epoll epoll_create : _ -> timeout:_ -> _)]
 ;;
 
 let create
@@ -403,7 +407,7 @@ let run
   in
   let status =
     protectx
-      ( (Sys.signal [@ocaml.alert "-unsafe_multidomain"]) Sys.sigpipe Sys.Signal_ignore
+      ( { portable = Sys.signal Sys.sigpipe Sys.Signal_ignore }
       , create
           ~keep_open
           ~use_extra_path
@@ -417,11 +421,9 @@ let run
           ~env
           ~input_string )
       ~f:(fun (_old_sigpipe, state) -> run_loop state ~start_time:(Time.now ()) ~timeout)
-      ~finally:(fun (old_sigpipe, state) ->
+      ~finally:(fun ({ portable = old_sigpipe }, state) ->
         List.iter state.open_fds ~f:close_non_intr;
-        ignore
-          ((Sys.signal [@ocaml.alert "-unsafe_multidomain"]) Sys.sigpipe old_sigpipe
-           : Sys.signal_behavior))
+        ignore (Sys.signal Sys.sigpipe old_sigpipe : Sys.signal_behavior))
   in
   { Command_result.status
   ; stdout_tail = Tail_buffer.contents stdout_tail

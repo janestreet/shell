@@ -29,7 +29,7 @@ module Process = struct
     ; stdout : string
     ; stderr : string
     }
-  [@@deriving sexp_of]
+  [@@deriving sexp_of] [@@unsafe_allow_any_mode_crossing]
 
   exception Failed of result [@@deriving sexp]
 
@@ -66,28 +66,50 @@ module Process = struct
   ;;
 
   module Defaults = struct
-    let timeout = ref None
-    let verbose = ref false
-    let echo = ref false
-    let preserve_euid = ref false
-    let strict_errors = ref false
+    type t =
+      { timeout : Time_float.Span.t option
+      ; verbose : bool
+      ; echo : bool
+      ; preserve_euid : bool
+      ; strict_errors : bool
+      }
+    [@@deriving fields ~fields]
   end
 
+  let defaults =
+    Atomic.make
+      ({ timeout = None
+       ; verbose = false
+       ; echo = false
+       ; preserve_euid = false
+       ; strict_errors = false
+       }
+       : Defaults.t)
+  ;;
+
   let set_defaults ?timeout ?verbose ?echo ?preserve_euid ?strict_errors () =
-    Option.iter ~f:(fun v -> Defaults.verbose := v) verbose;
-    Option.iter ~f:(fun v -> Defaults.timeout := v) timeout;
-    Option.iter ~f:(fun v -> Defaults.echo := v) echo;
-    Option.iter ~f:(fun v -> Defaults.preserve_euid := v) preserve_euid;
-    Option.iter ~f:(fun v -> Defaults.strict_errors := v) strict_errors
+    let set_one field opt defaults =
+      match opt with
+      | None -> defaults
+      | Some value -> Fieldslib.Field.fset field defaults value
+    in
+    Atomic.update defaults ~pure_f:(fun (defaults : Defaults.t) ->
+      defaults
+      |> set_one Defaults.Fields.timeout timeout
+      |> set_one Defaults.Fields.verbose verbose
+      |> set_one Defaults.Fields.echo echo
+      |> set_one Defaults.Fields.preserve_euid preserve_euid
+      |> set_one Defaults.Fields.strict_errors strict_errors)
   ;;
 
   let cmd program arguments = { program; arguments }
 
   let shell ?strict_errors s =
+    let defaults = Atomic.get defaults in
     let addtl_args =
-      let preserve_euid_args = if !Defaults.preserve_euid then [ "-p" ] else [] in
+      let preserve_euid_args = if defaults.preserve_euid then [ "-p" ] else [] in
       let strict_errors_args =
-        if Option.value strict_errors ~default:!Defaults.strict_errors
+        if Option.value strict_errors ~default:defaults.strict_errors
         then [ "-e"; "-u"; "-o"; "pipefail" ]
         else []
       in
@@ -150,17 +172,27 @@ module Process = struct
   let run_k'
     k
     ?use_extra_path
-    ?(timeout = !Defaults.timeout)
+    ?timeout
     ?working_dir
     ?setuid
     ?setgid
     ?env
-    ?(verbose = !Defaults.verbose)
-    ?(echo = !Defaults.echo)
+    ?verbose
+    ?echo
     ?input
     ?keep_open
     ?tail_len
     =
+    let timeout, verbose, echo =
+      match timeout, verbose, echo with
+      | Some timeout, Some verbose, Some echo -> timeout, verbose, echo
+      | _ ->
+        let defaults = Atomic.get defaults in
+        let timeout = Option.value timeout ~default:defaults.timeout in
+        let verbose = Option.value verbose ~default:defaults.verbose in
+        let echo = Option.value echo ~default:defaults.echo in
+        timeout, verbose, echo
+    in
     k (fun cmd stdoutf stderrf ->
       if echo then Console.Ansi.printf [ `Underscore ] !"Shell: %{}\n%!" cmd;
       let stderrf =
@@ -191,7 +223,7 @@ module Process = struct
         ())
   ;;
 
-  let run_k k ?(expect = [ 0 ]) =
+  let%template run_k k ?(expect = [ 0 ]) =
     run_k' (fun f ->
       k (fun cmd reader ->
         let acc = reader () in
@@ -220,6 +252,7 @@ module Process = struct
                  })
         with
         | Early_exit -> acc.flush ()))
+  [@@mode p = (nonportable, portable)]
   ;;
 
   let run ?expect = run_k (fun f cmd reader -> f cmd reader) ?expect
@@ -409,8 +442,12 @@ type 'a with_test_flags = ?true_v:int list -> ?false_v:int list -> 'a with_proce
 type 'a cmd = string -> string list -> 'a
 type ('a, 'ret) sh_cmd = ('a, unit, string, 'ret) format4 -> 'a
 
-let run_gen reader = Process.run_k (fun f prog args -> f (Process.cmd prog args) reader)
-let run = run_gen Process.discard
+let%template run_gen reader =
+  (Process.run_k [@mode p]) (fun f prog args -> f (Process.cmd prog args) reader)
+[@@mode p = (nonportable, portable)]
+;;
+
+let%template run = (run_gen [@mode portable]) Process.discard
 let run_lines ?eol = run_gen (Process.lines ?eol ())
 let run_one ?eol = run_gen (Process.head ?eol ())
 let run_one_exn ?eol = run_gen (Process.head_exn ?eol ())
@@ -420,6 +457,7 @@ let run_one_line ?eol = run_gen (Process.one_line ?eol ())
 let run_one_line_exn ?eol = run_gen (Process.one_line_exn ?eol ())
 let run_full = run_gen Process.content
 let run_fold ?eol ~init ~f = run_gen (Process.fold_lines ?eol ~init ~f ~flush:Fn.id)
+
 (*
    TEST_UNIT =
    (* This should not hand because the stdin is closed... *)
