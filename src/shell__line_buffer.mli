@@ -1,3 +1,5 @@
+@@ portable
+
 (** String buffers that automatically get flushed at every line return. *)
 
 type t

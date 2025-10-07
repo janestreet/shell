@@ -206,7 +206,7 @@ val ssh_test : ('a, bool) sh_cmd with_test_flags with_ssh_flags
 (** variable used by dispatch command to find binaries not in the path. The default values
     contains only directory which should be in PATH and is only useful in environments
     where the PATH variable has been blown away. *)
-val extra_path : string list ref
+val extra_path : string list Dynamic.t
 
 (** Process dispatching *)
 module Process : sig
@@ -218,19 +218,20 @@ module Process : sig
     | `Signaled of Signal.t (* WStopped is impossible*)
     ]
 
-  type t
+  type t : immutable_data
 
-  type result =
+  type result : immutable_data =
     { command : t
     ; status : status
     ; stdout : string
     ; stderr : string
     }
+  [@@unsafe_allow_any_mode_crossing]
 
   exception Failed of result
 
-  val to_string : t -> string
-  val status_to_string : status -> string
+  val to_string : t -> string @@ portable
+  val status_to_string : status -> string @@ portable
 
   val set_defaults
     :  ?timeout:Time_float.Span.t option
@@ -301,7 +302,7 @@ val ln : ?s:unit -> ?f:unit -> string -> string -> unit
       command;
     - When called on a non-existent file, [rm file] would raise, while [rm ~f:() file]
       would succeed. *)
-val rm : ?r:unit -> ?f:unit -> string -> unit
+val rm : ?r:unit -> ?f:unit -> string -> unit @@ portable
 
 (** Raises "Failed_command" *)
 val mv : string -> string -> unit

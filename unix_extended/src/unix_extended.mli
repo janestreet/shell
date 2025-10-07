@@ -1,3 +1,5 @@
+@@ portable
+
 (** Extensions to [Core_unix]. *)
 open! Core
 
@@ -51,8 +53,8 @@ val fork_exec
   -> string list
   -> Pid.t
 
-val seteuid : int -> unit
-val setreuid : uid:int -> euid:int -> unit
+val seteuid : int -> unit @@ nonportable
+val setreuid : uid:int -> euid:int -> unit @@ nonportable
 
 (** Network to host order long, like C. *)
 external ntohl : Int32.t -> Int32.t = "extended_ml_ntohl"
@@ -85,6 +87,7 @@ val strptime
   -> fmt:string
   -> string
   -> Unix.tm
+  @@ nonportable
 [@@deprecated "[since 2019-07] use Core_unix.strptime"]
 
 (** The CIDR module moved into Core_unix *)
@@ -118,7 +121,7 @@ module Mac_address = Nothing
   "[since 2020-11] New code should use the [Mac_address] library. Existing code can use \
    [Mac_address_deprecated] as a quick fix (which is an exact drop-in replacement)."]
 
-module Quota : sig
+module (Quota @@ nonportable) : sig @@ portable
   type bytes = private Int63.t [@@deriving sexp]
   type inodes = private Int63.t [@@deriving sexp]
 
@@ -139,6 +142,7 @@ module Quota : sig
     -> id:int
     -> path:string
     -> (bytes limit * bytes usage * inodes limit * inodes usage) Or_error.t
+    @@ nonportable
 
   val set
     :  [ `User | `Group ]
@@ -147,6 +151,7 @@ module Quota : sig
     -> bytes limit
     -> inodes limit
     -> unit Or_error.t
+    @@ nonportable
 end
 
 module Mount_entry : sig

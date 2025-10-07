@@ -2,7 +2,7 @@ open Core
 open Poly
 module Unix = Core_unix
 
-let extra_path = ref [ "/bin"; "/usr/bin"; "/usr/local/bin" ]
+let extra_path = Dynamic.make ([ "/bin"; "/usr/bin"; "/usr/local/bin" ] : string list)
 
 let get_path ?(use_extra_path = true) () =
   let env_path =
@@ -11,7 +11,7 @@ let get_path ?(use_extra_path = true) () =
     |> Option.value ~default:[]
     |> List.filter ~f:(( <> ) "")
   in
-  let path = if use_extra_path then env_path @ !extra_path else env_path in
+  let path = if use_extra_path then env_path @ Dynamic.get extra_path else env_path in
   List.stable_dedup ~compare:String.compare path
 ;;
 

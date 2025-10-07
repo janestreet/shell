@@ -14,8 +14,8 @@ module Stable0 = struct
 
         let to_int x = x
 
-        include
-          Sexpable.Of_sexpable.V1
+        include%template
+          Sexpable.Of_sexpable.V1 [@mode portable]
             (Int.V1)
             (struct
               type nonrec t = t
@@ -24,8 +24,8 @@ module Stable0 = struct
               let to_sexpable = to_int
             end)
 
-        include
-          Binable.Of_binable.V1 [@alert "-legacy"]
+        include%template
+          Binable.Of_binable.V1 [@alert "-legacy"] [@mode portable]
             (Int.V1)
             (struct
               type nonrec t = t
@@ -34,7 +34,7 @@ module Stable0 = struct
               let to_binable = to_int
             end)
 
-        include (val Comparator.V1.make ~compare ~sexp_of_t)
+        include%template (val (Comparator.V1.make [@mode portable]) ~compare ~sexp_of_t)
 
         let%expect_test _ =
           print_string [%bin_digest: t];
@@ -43,7 +43,8 @@ module Stable0 = struct
       end
 
       include T
-      include Comparable.V1.Make (T)
+
+      include%template Comparable.V1.Make [@mode portable] (T)
     end
   end
 end
@@ -65,6 +66,7 @@ external raw_fork_exec
   -> string
   -> string array
   -> Pid.t
+  @@ portable
   = "extended_ml_spawn_bc" "extended_ml_spawn"
 
 let raw_fork_exec ~stdin ~stdout ~stderr ?working_dir ?setuid ?setgid ?env prog argv =
@@ -178,13 +180,13 @@ let fork_exec
 
 external seteuid : int -> unit = "extended_ml_seteuid"
 external setreuid : uid:int -> euid:int -> unit = "extended_ml_setreuid"
-external htonl : Int32.t -> Int32.t = "extended_ml_htonl"
-external ntohl : Int32.t -> Int32.t = "extended_ml_ntohl"
+external htonl : Int32.t -> Int32.t @@ portable = "extended_ml_htonl"
+external ntohl : Int32.t -> Int32.t @@ portable = "extended_ml_ntohl"
 
 let%test _ = htonl (ntohl 0xdeadbeefl) = 0xdeadbeefl
 
 (** get load averages *)
-external getloadavg : unit -> float * float * float = "getloadavg_stub"
+external getloadavg : unit -> float * float * float @@ portable = "getloadavg_stub"
 
 module Extended_passwd = struct
   open Passwd
@@ -246,9 +248,9 @@ module Inet_port = struct
 
   let to_string x = Int.to_string x
   let to_int x = x
-  let arg_type = Command.Spec.Arg_type.create of_string_exn
+  let arg_type = (Command.Spec.Arg_type.create [@mode portable]) of_string_exn
 
-  include Comparable.Make_plain_using_comparator (T)
+  include%template Comparable.Make_plain_using_comparator [@mode portable] (T)
 end
 
 let%test _ = Inet_port.of_string "88" = Some 88
@@ -437,8 +439,11 @@ module Mount_entry = struct
       in
       Map.set (loop map : _ String.Map.t) ~key:(directory t) ~data:t
     in
-    List.fold ts ~init:String.Map.empty ~f:(fun map t ->
-      if not (String.is_prefix ~prefix:"/" (directory t)) then map else overlay map t)
+    List.fold
+      ts
+      ~init:(Map.empty (module String))
+      ~f:(fun map t ->
+        if not (String.is_prefix ~prefix:"/" (directory t)) then map else overlay map t)
   ;;
 end
 

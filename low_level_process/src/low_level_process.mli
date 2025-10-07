@@ -13,7 +13,7 @@ module Status : sig
     ]
   [@@deriving sexp_of]
 
-  val to_string : t -> string
+  val to_string : t -> string @@ portable
 end
 
 module Command_result : sig
@@ -59,3 +59,4 @@ val run
   -> args:string list
   -> unit
   -> Command_result.t
+  @@ portable
