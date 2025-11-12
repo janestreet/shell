@@ -29,7 +29,7 @@ module Process = struct
     ; stdout : string
     ; stderr : string
     }
-  [@@deriving sexp_of] [@@unsafe_allow_any_mode_crossing]
+  [@@deriving sexp_of]
 
   exception Failed of result [@@deriving sexp]
 
