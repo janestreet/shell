@@ -72,7 +72,7 @@ module%test [@name "unescaped_exn"] _ = struct
       ~message:"non-strict"
       (unescaped_exn ~strict:false "\\a")
       "\\a";
-    (* non-strict, illegal escape  *)
+    (* non-strict, illegal escape *)
     require_does_raise (fun () -> unescaped_exn ~strict:false "\\512");
     [%expect
       {|

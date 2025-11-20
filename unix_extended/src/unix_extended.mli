@@ -114,8 +114,8 @@ module Inet_port : sig
   end
 end
 
-(* the code for [Unix_extended.Mac_address] has been moved to
-   [Mac_address_deprecated] (in lib/mac_address/src/deprecated) *)
+(* the code for [Unix_extended.Mac_address] has been moved to [Mac_address_deprecated] (in
+   lib/mac_address/src/deprecated) *)
 module Mac_address = Nothing
 [@@deprecated
   "[since 2020-11] New code should use the [Mac_address] library. Existing code can use \

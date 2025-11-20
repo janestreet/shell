@@ -35,10 +35,10 @@ let collate s1 s2 =
       | Some _ -> consume0 s pos
       | None -> ()
     in
-    (* Our main loop works on string representation of ints where all the
-       trailing zeros have been chopped of. Their magnitude is given by the
-       length of their representation. If they have the same magnitude the
-       lexical order is correct. Bias is used to save that information.
+    (* Our main loop works on string representation of ints where all the trailing zeros
+       have been chopped of. Their magnitude is given by the length of their
+       representation. If they have the same magnitude the lexical order is correct. Bias
+       is used to save that information.
     *)
     let ok = Char.is_digit in
     let bias = ref 0 in
@@ -48,9 +48,8 @@ let collate s1 s2 =
       | None, Some _ -> -1
       | None, None when !bias <> 0 -> !bias
       | None, None ->
-        (* Both ints have the same value, The one with the shortest
-           representation (i.e. the least trailing zeroes) is
-           considered to be the smallest*)
+        (* Both ints have the same value, The one with the shortest representation (i.e.
+           the least trailing zeroes) is considered to be the smallest *)
         !pos1 - !pos2
       | Some c1, Some c2 when !bias = 0 ->
         bias := Char.compare c1 c2;
@@ -77,13 +76,12 @@ let collate s1 s2 =
 (** Inverse operation of [String.escaped] *)
 exception Unescape_error of bool * int * string
 
-(* The stdlib's escaped does a lot of fancy wazoo magic to avoid
-   using a buffer:
-   It works in two passes, the first one calculates the length of the string to
-   allocate and the second one does the actual escaping.
+(* The stdlib's escaped does a lot of fancy wazoo magic to avoid using a buffer: It works
+   in two passes, the first one calculates the length of the string to allocate and the
+   second one does the actual escaping.
 
-   This would be more cumbersome to do here but might be worth the hassle if
-   performance ever gets to be an issue *)
+   This would be more cumbersome to do here but might be worth the hassle if performance
+   ever gets to be an issue *)
 let unescaped' ?(strict = true) s =
   let len = String.length s in
   let pos = ref 0 in
@@ -231,8 +229,8 @@ let line_break ~len s =
   List.concat_map (String.split ~on:'\n' s) ~f:(fun s -> loop [] (String.split ~on:' ' s))
 ;;
 
-(* Finds out where to break a given line; returns the len of the line to break
-   and the staring position of the next line.*)
+(* Finds out where to break a given line; returns the len of the line to break and the
+   staring position of the next line. *)
 let rec word_wrap__break_one ~hard_limit ~soft_limit ~previous_match s ~pos ~len =
   if pos = String.length s
   then len, pos

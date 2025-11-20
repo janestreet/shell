@@ -72,8 +72,8 @@ external raw_fork_exec
 let raw_fork_exec ~stdin ~stdout ~stderr ?working_dir ?setuid ?setgid ?env prog argv =
   (* [spawn] is generally preferred: it seems better tested and more actively maintained.
      It also uses [vfork] so it's more efficient. For now we still must fall back to
-     [extended_ml_spawn] for the case when [setuid] or [setgid] is requested,
-     but we should completely switch to [spawn] when/if it supports that. *)
+     [extended_ml_spawn] for the case when [setuid] or [setgid] is requested, but we
+     should completely switch to [spawn] when/if it supports that. *)
   match setuid, setgid with
   | None, None ->
     let env = Option.map ~f:(fun env -> Spawn.Env.of_list (Array.to_list env)) env in
@@ -258,8 +258,8 @@ let%test _ = Inet_port.of_string "2378472398572" = None
 let%test _ = Inet_port.of_int 88 = Some 88
 let%test _ = Inet_port.of_int 872342 = None
 
-(* the code for [Unix_extended.Mac_address] has been moved to
-   [Mac_address_deprecated] (in lib/mac_address/src/deprecated) *)
+(* the code for [Unix_extended.Mac_address] has been moved to [Mac_address_deprecated] (in
+   lib/mac_address/src/deprecated) *)
 module Mac_address = Nothing
 [@@deprecated
   "[since 2020-11] New code should use the [Mac_address] library. Existing code can use \
@@ -448,12 +448,12 @@ module Mount_entry = struct
 end
 
 let tput_property ~default prop =
-  (* When both stdout and stderr are not terminals, tput outputs 80 (cols) or
-     24 (lines) rather than the actual size, so we can't use [Process.run].
-     Instead, we use [open_process_in] so that stderr is still the terminal.
-     But, we don't want tput's error messages to be sent to stderr and seen by
-     the user, so we first run tput with no output to see if it succeeds, and
-     only then do we run it with stderr not redirected. *)
+  (* When both stdout and stderr are not terminals, tput outputs 80 (cols) or 24 (lines)
+     rather than the actual size, so we can't use [Process.run]. Instead, we use
+     [open_process_in] so that stderr is still the terminal. But, we don't want tput's
+     error messages to be sent to stderr and seen by the user, so we first run tput with
+     no output to see if it succeeds, and only then do we run it with stderr not
+     redirected. *)
   try
     Exn.protectx
       (Core_unix.open_process_in
