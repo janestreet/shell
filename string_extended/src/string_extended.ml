@@ -1,7 +1,7 @@
 open Core
 
-(* Natural ordering like found in gnome nautilus, the mac finder etc...
-   Refer to Mli for more documentation
+(* Natural ordering like found in gnome nautilus, the mac finder etc... Refer to Mli for
+   more documentation
 *)
 let collate s1 s2 =
   let pos1 = ref 0
@@ -261,8 +261,7 @@ let rec word_wrap__break_one ~hard_limit ~soft_limit ~previous_match s ~pos ~len
         ~len:(len + 1))
 ;;
 
-(* Returns an pos*length list of all the lines (as substrings of the argument
-   passed in) *)
+(* Returns an pos*length list of all the lines (as substrings of the argument passed in) *)
 let rec word_wrap__find_substrings ~hard_limit ~soft_limit s acc pos =
   if pos < String.length s
   then (
