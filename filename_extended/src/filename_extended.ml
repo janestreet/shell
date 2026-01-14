@@ -32,8 +32,7 @@ let normalize_path p =
     | "..", h :: rest when h <> ".." -> rest
     | ".", v -> v
     | _ -> path_element :: acc
-    (* accumulate regular dirs or chains of ... at the beginning of a
-         relative path*))
+    (* accumulate regular dirs or chains of ... at the beginning of a relative path *))
   |> List.rev
 ;;
 
@@ -99,9 +98,9 @@ module%test [@name "normalize"] _ = struct
   let%test "negative_lookahead" = normalize "../a/../../b" = "../../b"
 end
 
-(* The "^" in these operator names is to make them right-associative.
-   It's important for them to be right-associative so that the short-circuiting works
-   correctly if you chain them. *)
+(* The "^" in these operator names is to make them right-associative. It's important for
+   them to be right-associative so that the short-circuiting works correctly if you chain
+   them. *)
 let ( ^/// ) src p = if is_absolute p then p else concat (src ()) p
 let ( ^// ) src p = (fun () -> src) ^/// p
 let make_absolute p = Sys_unix.getcwd ^/// p
@@ -147,12 +146,10 @@ let is_parent f1 f2 =
 
 (** Filename comparison *)
 
-(*
-   Extension comparison:
-   We have a list of lists of extension that should appear consecutive to one
-   another. Our comparison function works by mapping extensions to
-   (extension*int) couples, for instance "c" is mapped to "h,1" meaning it
-   should come right after h.
+(* Extension comparison: We have a list of lists of extension that should appear
+   consecutive to one another. Our comparison function works by mapping extensions to
+   (extension*int) couples, for instance "c" is mapped to "h,1" meaning it should come
+   right after h.
 *)
 let create_extension_map l =
   List.fold
