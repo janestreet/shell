@@ -4,7 +4,7 @@ module Stable0 = struct
   module Inet_port = struct
     module V1 = struct
       module T = struct
-        type t = int [@@deriving compare, equal, hash]
+        type t = int [@@deriving compare, equal, hash, stable_witness]
 
         let of_int_exn x =
           if x > 0 && x < 65536
@@ -44,7 +44,7 @@ module Stable0 = struct
 
       include T
 
-      include%template Comparable.V1.Make [@mode portable] (T)
+      include%template Comparable.V1.With_stable_witness.Make [@mode portable] (T)
     end
   end
 end

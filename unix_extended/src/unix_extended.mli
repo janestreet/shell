@@ -105,7 +105,7 @@ module Inet_port : sig
 
   module Stable : sig
     module V1 :
-      Stable_comparable.V1
+      Stable_comparable.With_stable_witness.V1
       with type t = t
        and type comparator_witness = comparator_witness
   end

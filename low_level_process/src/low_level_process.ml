@@ -312,7 +312,7 @@ let available_fds =
   in
   match Linux_ext.Epoll.create with
   | Error _ -> use_select
-  | Ok epoll_create -> [%eta (use_epoll epoll_create : _ -> timeout:_ -> _)]
+  | Ok epoll_create -> use_epoll epoll_create
 ;;
 
 let create
