@@ -10,14 +10,13 @@ let extra_path = Shell_internal.extra_path
 module Process = struct
   exception Early_exit [@@deriving sexp]
 
-  type status =
+  type status : immutable_data =
     [ `Timeout of Time_float.Span.t
     | Low_level_process.Status.t
     ]
-  [@@deriving sexp_of]
-  (*  type status = (unit, error) Result.t with sexp_of *)
+  [@@deriving sexp_of ~portable]
 
-  type t =
+  type t : immutable_data =
     { program : string
     ; arguments : string list
     }
@@ -31,8 +30,7 @@ module Process = struct
     }
   [@@deriving sexp_of]
 
-  exception Failed of result
-  [@@deriving sexp ~nonportable__magic_unsafe_in_parallel_programs]
+  exception Failed of result [@@deriving sexp]
 
   let to_string { program = prog; arguments = args } =
     let f s =
@@ -61,7 +59,7 @@ module Process = struct
   ;;
 
   let () =
-    (Stdlib.Printexc.register_printer [@ocaml.alert "-unsafe_multidomain"]) (function
+    Basement.Stdlib_shim.Printexc.Safe.register_printer (function
       | Failed r -> Some (format_failed r)
       | _ -> None)
   ;;

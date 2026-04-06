@@ -11,7 +11,7 @@ module Status : sig
     | `Exited of int
     | `Signaled of Signal.t (* WStopped is impossible*)
     ]
-  [@@deriving sexp_of]
+  [@@deriving sexp_of ~portable]
 
   val to_string : t -> string @@ portable
 end

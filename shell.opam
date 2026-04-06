@@ -6,11 +6,13 @@ bug-reports: "https://github.com/janestreet/shell/issues"
 dev-repo: "git+https://github.com/janestreet/shell.git"
 doc: "https://ocaml.janestreet.com/ocaml-core/latest/doc/shell/index.html"
 license: "MIT"
+x-maintenance-intent: ["(latest)"]
 build: [
   ["dune" "build" "-p" name "-j" jobs]
 ]
 depends: [
   "ocaml" {>= "5.1.0"}
+  "basement"
   "core"
   "core_unix"
   "jst-config"
