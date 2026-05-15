@@ -17,7 +17,7 @@ module Unix := Core_unix
     pass in fds with [close_on_exec] set.
 
     @param path_lookup
-      if [true] than we use PATH to find the process to exec. \@env specifies the
+      if [true] than we use PATH to find the process to exec. @env specifies the
       environment the process runs in
 
       ERRORS: Unix.unix_error. This function should not raise EINTR; it will restart

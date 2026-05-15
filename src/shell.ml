@@ -1,5 +1,5 @@
-(* TODO: Ron wants the ability to run interactive commands and to expose the fd
-   version of process handling.*)
+(* TODO: Ron wants the ability to run interactive commands and to expose the fd version of
+   process handling. *)
 open Core
 open Poly
 module Unix = Core_unix
@@ -144,9 +144,9 @@ module Process = struct
     ~host
     args
     =
-    (* quote_args quotes all arguments to the shell.  We need to escape all the
-       arguments because ssh is passing this to the remote shell which will
-       unescape all of that before passing it over to our program.*)
+    (* quote_args quotes all arguments to the shell. We need to escape all the arguments
+       because ssh is passing this to the remote shell which will unescape all of that
+       before passing it over to our program. *)
     let url =
       match user with
       | None -> host
@@ -434,7 +434,7 @@ type 'a with_process_flags =
   -> ?tail_len:int
   -> 'a
 
-type 'a with_run_flags = ?expect:(* Defaults to [0]*)
+type 'a with_run_flags = ?expect:(* Defaults to [0] *)
                            int list -> 'a with_process_flags
 
 type 'a with_test_flags = ?true_v:int list -> ?false_v:int list -> 'a with_process_flags
@@ -457,14 +457,9 @@ let run_one_line_exn ?eol = run_gen (Process.one_line_exn ?eol ())
 let run_full = run_gen Process.content
 let run_fold ?eol ~init ~f = run_gen (Process.fold_lines ?eol ~init ~f ~flush:Fn.id)
 
-(*
-   TEST_UNIT =
-   (* This should not hand because the stdin is closed... *)
-   run ~timeout:(Some (sec 0.5)) "cat" []
-   TEST_UNIT =
-   try
-   run ~timeout:(Some (sec 0.5)) "cat" []
-   with Process.
+(* TEST_UNIT = (* This should not hand because the stdin is closed... *) run
+   ~timeout:(Some (sec 0.5)) "cat" [] TEST_UNIT = try run ~timeout:(Some (sec 0.5)) "cat"
+   [] with Process.
 *)
 
 let test = Process.test_k (fun f prog args -> f (Process.cmd prog args))
@@ -477,7 +472,7 @@ let sh_gen reader ?strict_errors =
   Process.run_k (k_shell_command ?strict_errors (fun f cmd -> f cmd reader))
 ;;
 
-type 'a with_sh_flags = ?strict_errors:(* Defaults to [false]*)
+type 'a with_sh_flags = ?strict_errors:(* Defaults to [false] *)
                                        bool -> 'a
 
 let sh ?strict_errors = sh_gen Process.discard ?strict_errors
@@ -564,7 +559,7 @@ let mkdir ?p ?perm path =
   run "mkdir" (List.filter_map ~f:Fn.id [ p; mode; Some "--"; Some path ])
 ;;
 
-(* TODO: Deal with atomicity  *)
+(* TODO: Deal with atomicity *)
 let cp ?(overwrite = true) ?perm src dst =
   let perm =
     match perm with

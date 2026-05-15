@@ -19,7 +19,7 @@ let is_executable path =
   try
     let stat = Unix.stat path in
     stat.Unix.st_kind = Unix.S_REG (* Is file *) && stat.Unix.st_perm land 0o111 > 0
-    (* Is executable*)
+    (* Is executable *)
   with
   | Unix.Unix_error ((ENOENT | ENOTDIR), _, _) -> false (* File not found *)
 ;;
@@ -59,9 +59,8 @@ let path_expand ?use_extra_path prog =
   else prog
 ;;
 
-(* "real" switches between real and effective uids. sudo sets both real and
-   effective uids, so this will not work, though you should be able to use
-   $SUDO_UID *)
+(* "real" switches between real and effective uids. sudo sets both real and effective
+   uids, so this will not work, though you should be able to use $SUDO_UID *)
 let whoami ?(real = false) () =
   let uid = if real then Unix.getuid () else Unix.geteuid () in
   match Unix.Passwd.getbyuid uid with

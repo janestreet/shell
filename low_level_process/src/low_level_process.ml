@@ -32,9 +32,9 @@ module Process_info = struct
     }
 end
 
-(* We use a slightly more powerful version of create process than the one in
-   core. This version is not quite as carefuly code reviewed but allows us to
-   have more control over the forked side of the process (e.g.: chdir).
+(* We use a slightly more powerful version of create process than the one in core. This
+   version is not quite as carefuly code reviewed but allows us to have more control over
+   the forked side of the process (e.g.: chdir).
 *)
 let internal_create_process ?working_dir ?setuid ?setgid ~env ~prog ~args () =
   let close_on_err = ref [] in
@@ -134,7 +134,7 @@ module Status = struct
   type t =
     [ `Timeout of Time.Span.t
     | `Exited of int
-    | `Signaled of Signal.t (* WStopped is impossible*)
+    | `Signaled of Signal.t (* WStopped is impossible *)
     ]
   [@@deriving sexp_of]
 
@@ -186,8 +186,8 @@ let wait_for_exit ~is_child span pid =
     if Time.( > ) (Time.now ()) end_time
     then
       false
-      (*We need to explicitely waitpid the child otherwise we are sending
-        signals to a zombie*)
+      (* We need to explicitely waitpid the child otherwise we are sending signals to a
+         zombie *)
     else if not (exited ())
     then true
     else (
@@ -250,7 +250,7 @@ let process_io ~read ~write state =
             ~len:(state.in_len - state.in_pos))
       in
       state.in_pos <- state.in_pos + len;
-      (* Close the process's in_channel iff we are done writing to it*)
+      (* Close the process's in_channel iff we are done writing to it *)
       if len = 0
       then
         if state.keep_open
