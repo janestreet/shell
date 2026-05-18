@@ -152,9 +152,9 @@ val sh_one_line_exn : ('a, string) sh_cmd with_run_flags with_sh_flags
 val sh_first_line : ('a, string option) sh_cmd with_run_flags with_sh_flags
 val sh_first_line_exn : ('a, string) sh_cmd with_run_flags with_sh_flags
 
-(* Magic invocation to avoid asking for password if we can.  These arguments are
-   passed to ssh in the [ssh_*] functions below.  They're exposed in case you
-   want to use them in a different context. *)
+(* Magic invocation to avoid asking for password if we can. These arguments are passed to
+   ssh in the [ssh_*] functions below. They're exposed in case you want to use them in a
+   different context. *)
 val noninteractive_ssh_options : string list
 val noninteractive_no_hostkey_checking_options : string list
 
@@ -215,7 +215,7 @@ module Process : sig
   type status =
     [ `Timeout of Time_float.Span.t
     | `Exited of int
-    | `Signaled of Signal.t (* WStopped is impossible*)
+    | `Signaled of Signal.t (* WStopped is impossible *)
     ]
 
   type t : immutable_data

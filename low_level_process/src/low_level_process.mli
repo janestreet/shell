@@ -9,7 +9,7 @@ module Status : sig
   type t =
     [ `Timeout of Time_float.Span.t
     | `Exited of int
-    | `Signaled of Signal.t (* WStopped is impossible*)
+    | `Signaled of Signal.t (* WStopped is impossible *)
     ]
   [@@deriving sexp_of ~portable]
 
