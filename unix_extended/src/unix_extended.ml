@@ -4,7 +4,7 @@ module Stable0 = struct
   module Inet_port = struct
     module V1 = struct
       module T = struct
-        type t = int [@@deriving compare, equal, hash, stable_witness]
+        type t = int [@@deriving compare ~localize, equal ~localize, hash, stable_witness]
 
         let of_int_exn x =
           if x > 0 && x < 65536
@@ -25,13 +25,13 @@ module Stable0 = struct
             end)
 
         include%template
-          Binable.Of_binable.V1 [@alert "-legacy"] [@mode portable]
+          Binable.Of_binable.V1 [@alert "-legacy"] [@mode local] [@modality portable]
             (Int.V1)
             (struct
               type nonrec t = t
 
               let of_binable = of_int_exn
-              let to_binable = to_int
+              let%template[@mode m = (local, global)] to_binable = to_int
             end)
 
         include%template (val (Comparator.V1.make [@mode portable]) ~compare ~sexp_of_t)
@@ -223,7 +223,7 @@ module Inet_port = struct
   module Stable = Stable0.Inet_port
 
   module T = struct
-    type t = int [@@deriving compare, equal, hash]
+    type t = int [@@deriving compare ~localize, equal ~localize, hash]
     type comparator_witness = Stable.V1.comparator_witness
 
     let comparator = Stable.V1.comparator
@@ -250,7 +250,8 @@ module Inet_port = struct
   let to_int x = x
   let arg_type = (Command.Spec.Arg_type.create [@mode portable]) of_string_exn
 
-  include%template Comparable.Make_plain_using_comparator [@mode portable] (T)
+  include%template
+    Comparable.Make_plain_using_comparator [@mode local] [@modality portable] (T)
 end
 
 let%test _ = Inet_port.of_string "88" = Some 88

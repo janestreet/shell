@@ -7,7 +7,7 @@
  (libraries core core_unix shell_internal spawn core_unix.time_float_unix)
  (preprocessor_deps config.h)
  (preprocess
-  (pps ppx_jane)))
+  (pps ppx_jane -compare-require-explicit-locality)))
 
 (rule
  (targets config.h)

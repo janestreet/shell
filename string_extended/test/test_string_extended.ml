@@ -94,7 +94,8 @@ module%test [@name "unescaped_exn"] _ = struct
       in
       Expect_test_helpers_core.require_equal
         (module struct
-          type t = (string, (exn[@equal.ignore])) Result.t [@@deriving equal, sexp_of]
+          type t = (string, (exn[@equal.ignore])) Result.t
+          [@@deriving equal ~localize, sexp_of]
         end)
         (Result.try_with (fun () -> unescaped_exn s ~strict:true))
         (Result.try_with (fun () -> Scanf.unescaped s)))

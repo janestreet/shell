@@ -94,7 +94,7 @@ val strptime
 
 (** Simple int wrapper to be explicit about ports. *)
 module Inet_port : sig
-  type t [@@deriving sexp_of, compare, hash]
+  type t [@@deriving sexp_of, compare ~localize, hash]
 
   val of_int : int -> t option
   val of_int_exn : int -> t
@@ -104,11 +104,12 @@ module Inet_port : sig
   val to_string : t -> string
   val arg_type : t Command.Arg_type.t
 
-  include Comparable.S_plain with type t := t
+  include Comparable.S_plain [@mode local] with type t := t
 
   module Stable : sig
     module V1 :
       Stable_comparable.With_stable_witness.V1
+      [@mode local]
       with type t = t
        and type comparator_witness = comparator_witness
   end
