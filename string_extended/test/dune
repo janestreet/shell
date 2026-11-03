@@ -2,4 +2,4 @@
  (name string_extended_test)
  (libraries core expect_test_helpers_core string_extended)
  (preprocess
-  (pps ppx_jane)))
+  (pps ppx_jane -compare-require-explicit-locality)))

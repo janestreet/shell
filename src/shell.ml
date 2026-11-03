@@ -14,7 +14,7 @@ module Process = struct
     [ `Timeout of Time_float.Span.t
     | Low_level_process.Status.t
     ]
-  [@@deriving sexp_of ~portable]
+  [@@deriving sexp_of]
 
   type t =
     { program : string
@@ -222,7 +222,7 @@ module Process = struct
         ())
   ;;
 
-  let%template run_k k ?(expect = [ 0 ]) =
+  let run_k k ?(expect = [ 0 ]) =
     run_k' (fun f ->
       k (fun cmd reader ->
         let acc = reader () in
@@ -251,7 +251,6 @@ module Process = struct
                  })
         with
         | Early_exit -> acc.flush ()))
-  [@@mode p = (nonportable, portable)]
   ;;
 
   let run ?expect = run_k (fun f cmd reader -> f cmd reader) ?expect
@@ -441,12 +440,8 @@ type 'a with_test_flags = ?true_v:int list -> ?false_v:int list -> 'a with_proce
 type 'a cmd = string -> string list -> 'a
 type ('a, 'ret) sh_cmd = ('a, unit, string, 'ret) format4 -> 'a
 
-let%template run_gen reader =
-  (Process.run_k [@mode p]) (fun f prog args -> f (Process.cmd prog args) reader)
-[@@mode p = (nonportable, portable)]
-;;
-
-let%template run = (run_gen [@mode portable]) Process.discard
+let run_gen reader = Process.run_k (fun f prog args -> f (Process.cmd prog args) reader)
+let run = run_gen Process.discard
 let run_lines ?eol = run_gen (Process.lines ?eol ())
 let run_one ?eol = run_gen (Process.head ?eol ())
 let run_one_exn ?eol = run_gen (Process.head_exn ?eol ())

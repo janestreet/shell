@@ -14,8 +14,8 @@ module Stable0 = struct
 
         let to_int x = x
 
-        include%template
-          Sexpable.Of_sexpable.V1 [@mode portable]
+        include
+          Sexpable.Of_sexpable.V1
             (Int.V1)
             (struct
               type nonrec t = t
@@ -24,8 +24,8 @@ module Stable0 = struct
               let to_sexpable = to_int
             end)
 
-        include%template
-          Binable.Of_binable.V1 [@alert "-legacy"] [@mode portable]
+        include
+          Binable.Of_binable.V1 [@alert "-legacy"]
             (Int.V1)
             (struct
               type nonrec t = t
@@ -34,7 +34,7 @@ module Stable0 = struct
               let to_binable = to_int
             end)
 
-        include%template (val (Comparator.V1.make [@mode portable]) ~compare ~sexp_of_t)
+        include (val Comparator.V1.make ~compare ~sexp_of_t)
 
         let%expect_test _ =
           print_string [%bin_digest: t];
@@ -43,8 +43,7 @@ module Stable0 = struct
       end
 
       include T
-
-      include%template Comparable.V1.With_stable_witness.Make [@mode portable] (T)
+      include Comparable.V1.With_stable_witness.Make (T)
     end
   end
 end
@@ -247,9 +246,9 @@ module Inet_port = struct
 
   let to_string x = Int.to_string x
   let to_int x = x
-  let arg_type = (Command.Spec.Arg_type.create [@mode portable]) of_string_exn
+  let arg_type = Command.Spec.Arg_type.create of_string_exn
 
-  include%template Comparable.Make_plain_using_comparator [@mode portable] (T)
+  include Comparable.Make_plain_using_comparator (T)
 end
 
 let%test _ = Inet_port.of_string "88" = Some 88

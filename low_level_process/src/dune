@@ -4,4 +4,4 @@
  (libraries core core_unix.linux_ext shell_internal unix_extended core_unix
    core_unix.signal_unix core_unix.time_float_unix)
  (preprocess
-  (pps ppx_jane)))
+  (pps ppx_jane -compare-require-explicit-locality)))

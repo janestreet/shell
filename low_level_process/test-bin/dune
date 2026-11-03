@@ -10,4 +10,4 @@
  (names test_low_level_process)
  (libraries core low_level_process oUnit)
  (preprocess
-  (pps ppx_jane)))
+  (pps ppx_jane -compare-require-explicit-locality)))

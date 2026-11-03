@@ -4,4 +4,4 @@
  (libraries core core_unix core_unix.filename_unix shell_internal
    string_extended core_unix.sys_unix)
  (preprocess
-  (pps ppx_jane)))
+  (pps ppx_jane -compare-require-explicit-locality)))
